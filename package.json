@@ -1,0 +1,29 @@
+{
+  "name": "cccopy-console",
+  "version": "1.0.0",
+  "description": "The e-commerce website console",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development supervisor server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "videoarmy",
+  "license": "MIT",
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "gulp": "^4.0.1"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.19.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.16.4",
+    "express-session": "^1.16.1",
+    "md5": "^2.2.1",
+    "nunjucks": "^3.2.0",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "uuid": "^3.3.2"
+  }
+}
