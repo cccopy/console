@@ -54,10 +54,13 @@ module.exports = function(passport) {
             interface.validUser(email, password).then(
                 function(user){
                     console.log("login user:" + user);
-                    checkAndUpdateCookie(req, req.res);
+                    if (req.body.remember) utils.setCookie(req.res, uuidv4(), 1000 * 60 * 60 * 24 * 7); // 1 week
+                    else req.session.cookie.expires = false;
                     done( null, user );
                 },
-                function(err){ return done( null, false, { message: err } ); }
+                function(err){ 
+                    return done( null, false, req.flash('message', err) );
+                }
             );
         })
     );

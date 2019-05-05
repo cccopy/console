@@ -21,20 +21,9 @@ module.exports = function (app, passport) {
 	app.set('view cache', false);
 	app.set('view engine', 'njk');
 
-	if(isProduction) {
-		// temprorary did it like this, because we dont have DB yet.
-		app.use(session({
-			secret: '3EdCvFr$5TgBnHy^7Ujm',
-			resave: false,
-			cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
-		})); // session secret  
-	}else{
-		app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret  
-	}
+	app.use(session({ secret: '3EdCvFr$5TgBnHy^7Ujm', resave: false })); // session secret  
 
-	if ( !isProduction ) {
-		app.use('/assets', express.static(path.join(__dirname, '../..', 'assets')));
-	}
+	// cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
 
 	app.use(passport.initialize());
 	app.use(passport.session()); // persistent login sessions
@@ -45,6 +34,9 @@ module.exports = function (app, passport) {
 	app.use(bodyParser.urlencoded({limit: '100mb', extended: true})); // for parsing application/x-www-form-urlencoded
 	app.use(bodyParser.json({limit: '100mb'}));
 
+	if ( !isProduction ) {
+		app.use('/assets', express.static(path.join(__dirname, '../..', 'assets')));
+	}
 	// common ejs properties
 	// app.use(function(req, res, next){
 	//   res.locals.isDev = !isProduction;

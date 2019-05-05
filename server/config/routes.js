@@ -13,9 +13,8 @@ function loginRequired(req, res, next) {
     // if(process.env.NODE_ENV === 'development' || req.isAuthenticated()) return toNext();    
     if(req.isAuthenticated()) return next();
 
-    console.log("return to login");
     // if they aren't redirect them to the home page
-    res.redirect('/login');
+    res.redirect('/login?next=' + encodeURIComponent(req.originalUrl) );
 }
 
 module.exports = function(app, passport) {
@@ -40,19 +39,25 @@ module.exports = function(app, passport) {
     // =====================================
     // show the login form
     app.get('/login', function(req, res) {
-        // render the page and pass in any flash data if it exists
-        res.render('login');
+        if ( req.isAuthenticated() ) {
+            res.redirect( decodeURIComponent(req.query.next || "/") );
+        } else {
+            // render the page and pass in any flash data if it exists
+            res.render('login', { message: req.flash('message'), next: decodeURIComponent(req.query.next || "/") });
+        }
     });
     // show the logout view
     app.get('/logout', function(req, res) {
         req.logout();
-        res.redirect('/');
+        res.redirect('/login');
     });
-    // process the login form
-    app.post('/login', passport.authenticate('local-login', {
-        successRedirect : '/', // redirect to the secure profile section
-        failureRedirect : '/login', // redirect back to the signup page if there is an error
-        failureFlash : false // allow flash messages
-    }));
 
+    // process the login form
+    app.post('/login', 
+        passport.authenticate('local-login', {
+            failureRedirect : '/login', // redirect back to the signup page if there is an error
+            failureFlash : true // allow flash messages
+        }), function(req, res){
+            res.redirect( decodeURIComponent(req.body.next || "/") );
+        });
 };
