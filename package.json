@@ -2,6 +2,7 @@
   "name": "cccopy-console",
   "version": "1.0.0",
   "description": "The e-commerce website console",
+  "repository": "https://github.com/cccopy/console.git",
   "main": "server/index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development supervisor server/index.js",

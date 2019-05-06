@@ -53,9 +53,8 @@ module.exports = function(passport) {
         function(req, email, password, done) { // callback with email and password from our form
             interface.validUser(email, password).then(
                 function(user){
-                    console.log("login user:" + user);
-                    if (req.body.remember) utils.setCookie(req.res, uuidv4(), 1000 * 60 * 60 * 24 * 7); // 1 week
-                    else req.session.cookie.expires = false;
+                    // console.log("login user:" + user);
+                    utils.setCookie(req.res, uuidv4(), 1000 * 60 * 60 * 24 * 7); // 1 week
                     done( null, user );
                 },
                 function(err){ 
