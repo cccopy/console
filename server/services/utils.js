@@ -3,8 +3,7 @@ const url = require('url');
 const md5 = require('md5');
 const fs = require('fs');
 const uuidv4 = require('uuid/v4');
-
-var strkey = "_cc_ad";
+const strkey = require('../config/constants.json').sessionKey;
 
 exports.getCookie = function(req){
 	var res = null,
