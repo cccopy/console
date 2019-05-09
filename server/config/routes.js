@@ -49,6 +49,17 @@ module.exports = function(app, passport) {
         res.render('index');
     });
 
+
+    // =====================================
+    // CRUD Pages ==========================
+    // =====================================
+    app.get('/items/create', loginRequired, function(req, res){
+        res.render('items/create', { path: '/items/create' } );
+    });
+    app.get('/items/', loginRequired, function(req, res){
+        res.render('items/_list', { path: '/items/' } );
+    });
+
     // =====================================
     // Authentication ======================
     // =====================================
