@@ -5,6 +5,7 @@ var path = require('path');
 var utils = require('../services/utils');
 var interface = require('../services/interface');
 var nunjucks = require('nunjucks');
+var menus = require('../models/menus.config.json');
 var isDev = process.env.NODE_ENV === 'development';
 
 // route middleware to make sure a user is logged in
@@ -19,10 +20,24 @@ function loginRequired(req, res, next) {
 
 module.exports = function(app, passport) {
 
-    nunjucks.configure(app.get('views'), {
+    var nunEnv = nunjucks.configure(app.get('views'), {
         autoescape: true,
+        watch: true,
         express: app
     });
+
+    nunEnv.addFilter("isNamebase", function(path, compare){
+        return path.substr(0, compare.length) == compare;
+    });
+
+    nunEnv.addFilter("isItemActive", function(path, compare){
+        if (path == compare) return true;
+        if (path.substr(0, compare.length) == compare) return !isNaN(parseInt(path.slice(compare.length).split("/")[0]));
+        return false;
+    });
+
+    nunEnv.addGlobal("menus", menus);
+
 
     // =====================================
     // Static Files ========================

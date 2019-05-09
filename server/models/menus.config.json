@@ -1,0 +1,17 @@
+[
+	{
+		"title": "項目管理",
+		"iconClass": "ion ion-md-business",
+		"urlbase": "/items",
+		"items": [
+			{
+				"title": "列表",
+				"url": "/"
+			},
+			{
+				"title": "新增",
+				"url": "/create"
+			}
+		]
+	}
+]

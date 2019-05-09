@@ -1,0 +1,71 @@
+
+{% extends "base.njk" %}
+
+{% block content %}
+<!-- Layout wrapper -->
+<div class="layout-wrapper layout-2">
+	<div class="layout-inner">
+
+		<!-- Layout sidenav -->
+		<div id="layout-sidenav" class="layout-sidenav sidenav sidenav-vertical bg-dark">
+
+			<!-- Brand demo (see assets/css/demo/demo.css) -->
+			<div class="app-brand demo">
+				<span class="app-brand-logo demo">
+	            	<img src="/assets/img/c-icon.png">
+				</span>
+				<a href="/" class="app-brand-text demo sidenav-text font-weight-normal ml-2">CCcopy</a>
+				<a href="javascript:void(0)" class="layout-sidenav-toggle sidenav-link text-large ml-auto">
+					<i class="ion ion-md-menu align-middle"></i>
+				</a>
+			</div>
+
+			<div class="sidenav-divider mt-0"></div>
+
+			<!-- Links -->
+			<ul class="sidenav-inner py-1">
+				{% for menu in menus %}
+				{% set inbase = path|isNamebase(menu.urlbase) %}
+				<li class="sidenav-item {% if inbase %}open active{% endif %}">
+					<a href="javascript:void(0)" class="sidenav-link sidenav-toggle"><i class="sidenav-icon {{ menu.iconClass }}"></i>
+						<div>{{ menu.title }}</div>
+					</a>
+					{% if menu.items|length %}
+					<ul class="sidenav-menu">
+						{% for item in menu.items %}
+						{% set linkurl = [menu.urlbase, item.url] | join %}
+						<li class="sidenav-item {% if inbase and path|isItemActive(linkurl) %}active{% endif %}">
+							<a href="{{ linkurl }}" class="sidenav-link">
+								<div>{{ item.title }}</div>
+							</a>
+						</li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+
+		<!-- Layout container -->
+		<div class="layout-container">
+			<!-- Layout content -->
+			<div class="layout-content">
+
+				<!-- Content -->
+				<div class="container-fluid flex-grow-1 container-p-y">
+				{% block innerContent %}
+				{% endblock %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+
+{% block bodyjs %}
+<!-- Demo -->
+<script src="/assets/js/demo.js"></script>
+{% endblock %}	
