@@ -21,7 +21,12 @@ module.exports = function (app, passport) {
 	app.set('view cache', false);
 	app.set('view engine', 'njk');
 
-	app.use(session({ secret: '3EdCvFr$5TgBnHy^7Ujm', resave: false })); // session secret  
+	app.use(session({ 
+		secret: '3EdCvFr$5TgBnHy^7Ujm', 
+		resave: false,
+		cookie: { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true },
+		saveUninitialized: true
+	})); // session secret  
 
 	// cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
 

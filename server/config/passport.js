@@ -54,7 +54,7 @@ module.exports = function(passport) {
             interface.validUser(email, password).then(
                 function(user){
                     // console.log("login user:" + user);
-                    utils.setCookie(req.res, uuidv4(), 1000 * 60 * 60 * 24 * 7); // 1 week
+                    // utils.setCookie(req.res, uuidv4(), 1000 * 60 * 60 * 24 * 7); // 1 week
                     done( null, user );
                 },
                 function(err){ 
