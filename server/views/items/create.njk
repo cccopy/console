@@ -1,8 +1,23 @@
 
 {% extends "layout.njk" %}
 
+{% import "macros/container.njk" as container %}
+
 {% block headtitle %}項目管理 新增{% endblock %}
 
+{% block css %}
+<link rel="stylesheet" href="/assets/vendor/libs/select2/select2.css">
+{% endblock %}
+
+{% block bodyjs %}
+{{ super() }}
+<script src="/assets/vendor/libs/select2/select2.js"></script>
+<script src="/assets/js/forms.js"></script>
+{% endblock %}	
+
 {% block innerContent %}
-新增
+<h4 class="font-weight-bold py-3 mb-4">項目新增</h4>
+	{% if layouts.layout == 'tabs' %}
+	{{ container.tabs(layouts.sections, relateds) }}
+	{% endif %}
 {% endblock %}

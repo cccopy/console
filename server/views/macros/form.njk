@@ -1,0 +1,58 @@
+
+{% macro fieldtip(tip='') %}
+{% if tip|length %}
+<small class="form-text text-muted">{{ tip }}</small>
+{% endif %}
+{% endmacro %}
+
+{% macro textfield(name, label, value='', placeholder='', tip='') %}
+<div class="form-group row">
+	<label class="col-form-label col-sm-2 text-sm-right">{{ label }}</label>
+	<div class="col-sm-10">
+		<input type="text" name="{{ name }}" value="{{ value | escape }}" class="form-control" placeholder="{{ placeholder }}">
+		{{ fieldtip(tip) }}
+	</div>
+</div>
+{% endmacro %}
+
+{% macro textareafield(name, label, rows=3, value='', placeholder='', tip='') %}
+<div class="form-group row">
+	<label class="col-form-label col-sm-2 text-sm-right">{{ label }}</label>
+	<div class="col-sm-10">
+		<textarea class="form-control" name="{{ name }}" rows="{{ rows }}" placeholder="{{ placeholder }}">{{ value | escape }}</textarea>
+		{{ fieldtip(tip) }}
+	</div>
+</div>
+{% endmacro %}
+
+{% macro numberfield(name, label, min=0, max=100000, step=1000, value='', placeholder='', tip='') %}
+<div class="form-group row">
+	<label class="col-form-label col-sm-2 text-sm-right">{{ label }}</label>
+	<div class="col-sm-10">
+		<div class="input-group">
+			<div class="input-group-prepend">
+				<div class="input-group-text">$</div>
+			</div>
+			<input type="number" name="{{ name }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" class="form-control" value="{{ value | escape }}" placeholder="{{ placeholder }}">
+		</div>
+		{{ fieldtip(tip) }}
+	</div>
+</div>
+{% endmacro %}
+
+{% macro tagsselection(name, label, options, tip='') %}
+<div class="form-group row">
+	<label class="col-form-label col-sm-2 text-sm-right">{{ label }}</label>
+	<div class="col-sm-10">
+		<select name="{{ name }}" class="select2-tags form-control" multiple>
+			{% for opt in options %}
+			<option value="{{ opt.value }}" {% if opt.selected == true %}selected{% endif %}>{{ opt.label }}</option>
+		    {% endfor %}
+		</select>
+		{{ fieldtip(tip) }}
+	</div>
+</div>
+{% endmacro %}
+
+
+

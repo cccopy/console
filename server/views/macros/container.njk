@@ -1,0 +1,37 @@
+
+{% import "macros/form.njk" as forms %}
+
+{% macro tabs(sections, relateds) %}
+<div class="nav-tabs-top nav-responsive-sm">
+	<ul class="nav nav-tabs">
+		{% for sec in sections %}
+		<li class="nav-item">
+			<a class="nav-link {% if loop.first %}active{% endif %}" data-toggle="tab" href="#{{ sec.id }}">{{ sec.title }}</a>
+		</li>
+		{% endfor %}
+	</ul>
+	<div class="tab-content">
+		{% for sec in sections %}
+		<div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ sec.id }}">
+			<div class="card-body">
+			{% set fields = sec.fields %}
+			{% for field in fields %}
+				{% if field.type == 'string' %}
+					{% set placeholder = field|getPlace %}
+					{{ forms.textfield(field.name, field.label, tip=field.tip, placeholder=placeholder) }}
+				{% elif field.type == 'text' %}
+					{% set placeholder = field|getPlace %}
+					{{ forms.textareafield(field.name, field.label, tip=field.tip, placeholder=placeholder) }}
+				{% elif field.type == 'integer' %}
+					{% set placeholder = field|getPlace %}
+					{{ forms.numberfield(field.name, field.label, tip=field.tip, placeholder=placeholder) }}
+				{% elif field.type == 'collection' and field.layout == 'tags-selection' %}
+					{{ forms.tagsselection(field.name, field.label, tip=field.tip, options=relateds[field.related]) }}
+				{% endif %}
+			{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+{% endmacro %}

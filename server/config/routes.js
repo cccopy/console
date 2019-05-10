@@ -61,7 +61,17 @@ module.exports = function(app, passport) {
     // CRUD Pages ==========================
     // =====================================
     app.get('/items/create', loginRequired, function(req, res){
-        res.render('items/create', { path: '/items/create' } );
+        res.render('items/create', { 
+            path: '/items/create', layouts: createLayout, 
+            relateds: {
+                keywords: [
+                    { value: "test1", label: "TEST1"},
+                    { value: "test2", label: "TEST2"},
+                    { value: "test3", label: "TEST3", selected: true},
+                    { value: "test4", label: "TEST4"}
+                ]
+            }
+        } );
     });
     app.get('/items/', loginRequired, function(req, res){
         res.render('items/_list', { path: '/items/' } );
