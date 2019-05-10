@@ -1,0 +1,213 @@
+{
+	"layout": "tabs",
+	"sections": [
+		{
+			"title": "基本資料",
+			"id": "tab-basic",
+			"fields": [
+				{
+					"name": "title",
+					"label": "項目標題",
+					"required": true,
+					"type": "string"
+				},
+				{
+					"name": "description",
+					"label": "說明文字",
+					"required": true,
+					"tip": "影片特點",
+					"type": "text"
+				},
+				{
+					"name": "price",
+					"type": "integer",
+					"required": true,
+					"label": "價格"
+				}, 
+				{
+					"name": "factors",
+					"label": "影片元素",
+					"type": "string"
+				},
+				{
+					"name": "length",
+					"type": "string",
+					"label": "影片長度",
+					"required": true
+				},
+				{
+					"name": "context",
+					"label": "適用情境",
+					"type": "string",
+					"tip": "影片播放目的",
+					"required": true
+				},
+				{
+					"name": "position",
+					"type": "string",
+					"label": "適合播放版位"
+				},
+				{
+					"name": "keywords",
+					"type": "collection",
+					"related": "keywords",
+					"label": "關鍵字",
+					"required": true,
+					"layout": "tags-selection"
+				},
+				{
+					"name": "delivery",
+					"type": "string",
+					"label": "交付項目",
+					"required": true
+				},
+				{
+					"name": "period",
+					"type": "string",
+					"label": "交期",
+					"required": true
+				}
+			]
+		},
+		{
+			"title": "附加價格",
+			"id": "tab-addition-prices",
+			"fields": [
+				{
+					"name": "discountPrice",
+					"type": "integer",
+					"label": "優惠價"
+				}, 
+				{
+					"name": "urgentPrice",
+					"type": "integer",
+					"label": "急件加價"
+				},
+				{
+					"name": "urgentDescription",
+					"type": "text",
+					"label": "急件加價說明"
+				},
+				{
+					"name": "customizePrice",
+					"type": "integer",
+					"label": "特殊加價"
+				},
+				{
+					"name": "customizeDescription",
+					"type": "text",
+					"label": "特殊加價說明"
+				}
+			]
+		},
+		{
+			"title": "劇本結構",
+			"id": "tab-scenario",
+			"fields": [
+				{
+					"name": "scenario",
+					"type": "json",
+					"layout": {
+						"type": "list",
+						"tuples": [
+							{
+								"name": "label",
+								"type": "string",
+								"label": "標籤"
+							},
+							{
+								"name": "image",
+								"type": "file",
+								"label": "圖片"
+							},
+							{
+								"name": "description",
+								"type": "text",
+								"label": "敍述文字"
+							}
+						]
+					},
+					"label": "劇本結構",
+					"required": true
+				}
+			]
+		},
+		{
+			"title": "影片網址",
+			"id": "tab-film-urls",
+			"fields": [
+				{
+					"name": "productUrls",
+					"type": "json",
+					"label": "影片網址或圖片",
+					"required": true,
+					"layout": {
+						"type": "list",
+						"formats": ["string"]
+					}
+				}
+			]
+		},
+		{
+			"title": "需求素材",
+			"id": "tab-demand-factors",
+			"fields": [
+				{
+					"name": "submitFactors",
+					"label": "用戶需提交素材",
+					"type": "json",
+					"related": "options",
+					"required": true,
+					"layout": {
+						"type": "list",
+						"tuples": [
+							{
+								"name": "field",
+								"type": "string",
+								"layout": "selection",
+								"label": "選項群組"
+							},
+							{
+								"name": "values",
+								"type": "json",
+								"layout": "tags-selection",
+								"label": "對應值清單"
+							}
+						]
+					}
+				}
+			]
+		},
+		{
+			"title": "其它",
+			"id": "tab-others",
+			"fields": [
+				{
+					"name": "remarks",
+					"type": "text",
+					"label": "其它備註"
+				},
+				{
+					"name": "otherProperties",
+					"label": "其它屬性說明",
+					"type": "json",
+					"layout": {
+						"type": "list",
+						"tuples": [
+							{
+								"name": "title",
+								"type": "string",
+								"label": "標題"
+							},
+							{
+								"name": "description",
+								"type": "text",
+								"label": "文字"
+							}
+						]
+					}
+				}
+			]
+		}
+	]
+}

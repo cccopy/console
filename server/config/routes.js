@@ -5,8 +5,11 @@ var path = require('path');
 var utils = require('../services/utils');
 var interface = require('../services/interface');
 var nunjucks = require('nunjucks');
-var menus = require('../models/menus.config.json');
 var isDev = process.env.NODE_ENV === 'development';
+
+// views model
+var menus = require('../models/menus.config.json');
+var createLayout = require('../models/items/create.config.json');
 
 // route middleware to make sure a user is logged in
 function loginRequired(req, res, next) {
@@ -34,6 +37,10 @@ module.exports = function(app, passport) {
         if (path == compare) return true;
         if (path.substr(0, compare.length) == compare) return !isNaN(parseInt(path.slice(compare.length).split("/")[0]));
         return false;
+    });
+
+    nunEnv.addFilter("getPlace", function(opt){
+        return opt.placeholder || opt.label || "";
     });
 
     nunEnv.addGlobal("menus", menus);
