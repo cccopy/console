@@ -63,7 +63,7 @@ module.exports = function(app, passport) {
     app.get('/items/create', loginRequired, function(req, res){
         res.render('items/create', { 
             path: '/items/create', layouts: createLayout, 
-            relateds: {
+            data: {
                 keywords: [
                     { value: "test1", label: "TEST1"},
                     { value: "test2", label: "TEST2"},

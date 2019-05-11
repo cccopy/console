@@ -1,7 +1,35 @@
 
 {% import "macros/form.njk" as forms %}
 
-{% macro tabs(sections, relateds) %}
+{% macro parseField(field, data={}) %}
+{% if field.type == 'string' %}
+	{% set placeholder = field|getPlace %}
+	{{ forms.textfield(field.name, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+{% elif field.type == 'text' %}
+	{% set placeholder = field|getPlace %}
+	{{ forms.textareafield(field.name, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+{% elif field.type == 'integer' %}
+	{% set placeholder = field|getPlace %}
+	{{ forms.numberfield(field.name, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+{% elif field.type == 'collection' and field.layout == 'tags-selection' %}
+	{{ forms.tagsselection(field.name, tip=field.tip, options=data[field.related]) }}
+{% elif field.type == 'json' %}
+	{% if field.layout == 'list' %}
+	{{ editlist(field.fields, data[field.name]) }}
+	{% endif %}
+{% endif %}
+{% endmacro %}
+
+{% macro parseFormField(field, data={}) %}
+<div class="form-group row">
+	<label class="col-form-label col-sm-2 text-sm-right">{{ field.label }}</label>
+	<div class="col-sm-10">
+		{{ parseField(field, data) }}
+	</div>
+</div>
+{% endmacro %}
+
+{% macro tabs(sections, data={}) %}
 <div class="nav-tabs-top nav-responsive-sm">
 	<ul class="nav nav-tabs">
 		{% for sec in sections %}
@@ -16,22 +44,41 @@
 			<div class="card-body">
 			{% set fields = sec.fields %}
 			{% for field in fields %}
-				{% if field.type == 'string' %}
-					{% set placeholder = field|getPlace %}
-					{{ forms.textfield(field.name, field.label, tip=field.tip, placeholder=placeholder) }}
-				{% elif field.type == 'text' %}
-					{% set placeholder = field|getPlace %}
-					{{ forms.textareafield(field.name, field.label, tip=field.tip, placeholder=placeholder) }}
-				{% elif field.type == 'integer' %}
-					{% set placeholder = field|getPlace %}
-					{{ forms.numberfield(field.name, field.label, tip=field.tip, placeholder=placeholder) }}
-				{% elif field.type == 'collection' and field.layout == 'tags-selection' %}
-					{{ forms.tagsselection(field.name, field.label, tip=field.tip, options=relateds[field.related]) }}
+				{% if loop.length == 1 %}
+				{{ parseField(field, data) }}
+				{% else %}
+				{{ parseFormField(field, data) }}
 				{% endif %}
 			{% endfor %}
 			</div>
 		</div>
 		{% endfor %}
 	</div>
+</div>
+{% endmacro %}
+
+{% macro editlist(fields, datalist=[]) %}
+<div class="table-responsive">
+	<table class="table product-discounts-edit">
+		<thead>
+			<tr>
+				{% for field in fields %}
+				<th>{{ field.label }}</th>
+				{% endfor %}
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for data in datalist %}
+			<tr>
+				{% for field in fields %}
+				<td>
+					{{ parseField(field, data) }}
+				</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 </div>
 {% endmacro %}

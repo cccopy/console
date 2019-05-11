@@ -107,26 +107,24 @@
 				{
 					"name": "scenario",
 					"type": "json",
-					"layout": {
-						"type": "list",
-						"tuples": [
-							{
-								"name": "label",
-								"type": "string",
-								"label": "標籤"
-							},
-							{
-								"name": "image",
-								"type": "file",
-								"label": "圖片"
-							},
-							{
-								"name": "description",
-								"type": "text",
-								"label": "敍述文字"
-							}
-						]
-					},
+					"layout": "list",
+					"fields": [
+						{
+							"name": "label",
+							"type": "string",
+							"label": "標籤"
+						},
+						{
+							"name": "image",
+							"type": "image",
+							"label": "圖片"
+						},
+						{
+							"name": "description",
+							"type": "text",
+							"label": "敍述文字"
+						}
+					],
 					"label": "劇本結構",
 					"required": true
 				}
@@ -141,10 +139,9 @@
 					"type": "json",
 					"label": "影片網址或圖片",
 					"required": true,
-					"layout": {
-						"type": "list",
-						"formats": ["string"]
-					}
+					"layout": "list",
+					"fields": ["string"],
+					"formats": ["string", "image"]
 				}
 			]
 		},
@@ -158,23 +155,21 @@
 					"type": "json",
 					"related": "options",
 					"required": true,
-					"layout": {
-						"type": "list",
-						"tuples": [
-							{
-								"name": "field",
-								"type": "string",
-								"layout": "selection",
-								"label": "選項群組"
-							},
-							{
-								"name": "values",
-								"type": "json",
-								"layout": "tags-selection",
-								"label": "對應值清單"
-							}
-						]
-					}
+					"layout": "list",
+					"fields": [
+						{
+							"name": "field",
+							"type": "string",
+							"layout": "selection",
+							"label": "選項群組"
+						},
+						{
+							"name": "values",
+							"type": "json",
+							"layout": "tags-selection",
+							"label": "對應值清單"
+						}
+					]
 				}
 			]
 		},
@@ -191,21 +186,19 @@
 					"name": "otherProperties",
 					"label": "其它屬性說明",
 					"type": "json",
-					"layout": {
-						"type": "list",
-						"tuples": [
-							{
-								"name": "title",
-								"type": "string",
-								"label": "標題"
-							},
-							{
-								"name": "description",
-								"type": "text",
-								"label": "文字"
-							}
-						]
-					}
+					"layout": "list",
+					"fields": [
+						{
+							"name": "title",
+							"type": "string",
+							"label": "標題"
+						},
+						{
+							"name": "description",
+							"type": "text",
+							"label": "文字"
+						}
+					]
 				}
 			]
 		}
