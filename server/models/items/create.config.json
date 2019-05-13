@@ -53,7 +53,8 @@
 					"related": "keywords",
 					"label": "關鍵字",
 					"required": true,
-					"layout": "tags-selection"
+					"layout": "tags-selection",
+					"autoCreate": true
 				},
 				{
 					"name": "delivery",

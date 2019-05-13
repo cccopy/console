@@ -12,7 +12,7 @@
 	{% set placeholder = field|getPlace %}
 	{{ forms.numberfield(field.name, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
 {% elif field.type == 'collection' and field.layout == 'tags-selection' %}
-	{{ forms.tagsselection(field.name, tip=field.tip, options=data[field.related]) }}
+	{{ forms.tagsselection(field.name, tip=field.tip, options=data[field.related], autoCreate=field.autoCreate) }}
 {% elif field.type == 'json' %}
 	{% if field.layout == 'list' %}
 	{{ editlist(field.fields, data[field.name]) }}

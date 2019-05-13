@@ -28,9 +28,9 @@
 {{ fieldtip(tip) }}
 {% endmacro %}
 
-{% macro tagsselection(name, label='', options=[], tip='') %}
+{% macro tagsselection(name, label='', options=[], tip='', autoCreate=false) %}
 {% if label|length %}{{ label }}{% endif %}
-<select name="{{ name }}" class="select2-tags form-control" multiple>
+<select name="{{ name }}" class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %}>
 	{% for opt in options %}
 	<option value="{{ opt.value }}" {% if opt.selected == true %}selected{% endif %}>{{ opt.label }}</option>
     {% endfor %}
