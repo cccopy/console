@@ -69,10 +69,30 @@ module.exports = function(app, passport) {
                     { value: "test2", label: "TEST2"},
                     { value: "test3", label: "TEST3", selected: true},
                     { value: "test4", label: "TEST4"}
+                ],
+                scenario: [
+                    { label: "爛", description: "shit" }
                 ]
             }
         } );
     });
+    app.post('/items/create', loginRequired, function(req, res){
+        var layouts = createLayout;
+        var fields = [];
+        if (layouts.layout == "tabs") {
+            fields = layouts.sections
+                .map(function(sec){ return sec.fields; })
+                .reduce(function(f1, f2){ return f1.concat(f2) }, []);
+        } else {
+            fields = layouts.fields;
+        }
+        fields.forEach(function(f){
+            if(f.name) console.log(req.body[f.name]);
+        });
+
+        res.redirect('/items/');
+    });
+
     app.get('/items/', loginRequired, function(req, res){
         res.render('items/_list', { path: '/items/' } );
     });

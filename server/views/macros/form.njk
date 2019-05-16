@@ -5,15 +5,19 @@
 {% endif %}
 {% endmacro %}
 
+{% macro hiddenfield(name, value='', valueprop='') %}
+<input type="hidden" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" valueprop="{{ valueprop }}">
+{% endmacro %}
+
 {% macro textfield(name, label='', value='', placeholder='', tip='') %}	
 {% if label|length %}{{ label }}{% endif %}
-<input type="text" name="{{ name }}" value="{{ value | escape }}" class="form-control" placeholder="{{ placeholder }}">
+<input type="text" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" class="form-control" placeholder="{{ placeholder }}">
 {{ fieldtip(tip) }}
 {% endmacro %}
 
 {% macro textareafield(name, label='', rows=3, value='', placeholder='', tip='') %}
 {% if label|length %}{{ label }}{% endif %}
-<textarea class="form-control" name="{{ name }}" rows="{{ rows }}" placeholder="{{ placeholder }}">{{ value | escape }}</textarea>
+<textarea class="form-control" {% if name|length %}name="{{ name }}"{% endif %} rows="{{ rows }}" placeholder="{{ placeholder }}">{{ value | escape }}</textarea>
 {{ fieldtip(tip) }}
 {% endmacro %}
 
@@ -23,14 +27,27 @@
 	<div class="input-group-prepend">
 		<div class="input-group-text">$</div>
 	</div>
-	<input type="number" name="{{ name }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" class="form-control" value="{{ value | escape }}" placeholder="{{ placeholder }}">
+	<input type="number" {% if name|length %}name="{{ name }}"{% endif %} min="{{ min }}" max="{{ max }}" step="{{ step }}" class="form-control" value="{{ value | escape }}" placeholder="{{ placeholder }}">
 </div>
 {{ fieldtip(tip) }}
 {% endmacro %}
 
+{% macro imagefilefield(name, label='選擇圖片', value='') %}
+<label class="img-thumbnail img-thumbnail-shadow" image-field>
+	<span class="img-thumbnail-overlay bg-white opacity-75"></span>
+	<span class="img-thumbnail-content text-secondary text-medium">{{ label }}</span>
+	{% set imgurl = '/assets/img/empty.png' %}
+	{% if value|length %}
+		{% set imgurl = value %}
+	{% endif %}
+	<img src="{{ imgurl }}" alt="" class="img-fluid">
+	<input type="file" accept="image/*" {% if name|length %}name="{{ name }}"{% endif %}>
+</label>
+{% endmacro %}
+
 {% macro tagsselection(name, label='', options=[], tip='', autoCreate=false) %}
 {% if label|length %}{{ label }}{% endif %}
-<select name="{{ name }}" class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %}>
+<select {% if name|length %}name="{{ name }}"{% endif %} class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %}>
 	{% for opt in options %}
 	<option value="{{ opt.value }}" {% if opt.selected == true %}selected{% endif %}>{{ opt.label }}</option>
     {% endfor %}

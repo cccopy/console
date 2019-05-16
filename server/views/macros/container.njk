@@ -1,21 +1,27 @@
 
 {% import "macros/form.njk" as forms %}
 
-{% macro parseField(field, data={}) %}
+{% macro parseField(field, data={}, noname=false) %}
+{% set fieldname = field.name %}
+{% if noname %}
+	{% set fieldname = '' %}
+{% endif %}
 {% if field.type == 'string' %}
 	{% set placeholder = field|getPlace %}
-	{{ forms.textfield(field.name, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+	{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
 {% elif field.type == 'text' %}
 	{% set placeholder = field|getPlace %}
-	{{ forms.textareafield(field.name, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+	{{ forms.textareafield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
 {% elif field.type == 'integer' %}
 	{% set placeholder = field|getPlace %}
-	{{ forms.numberfield(field.name, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+	{{ forms.numberfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+{% elif field.type == 'image' %}
+	{{ forms.imagefilefield(fieldname, value=data[field.name]) }}
 {% elif field.type == 'collection' and field.layout == 'tags-selection' %}
-	{{ forms.tagsselection(field.name, tip=field.tip, options=data[field.related], autoCreate=field.autoCreate) }}
+	{{ forms.tagsselection(fieldname, tip=field.tip, options=data[field.related], autoCreate=field.autoCreate) }}
 {% elif field.type == 'json' %}
 	{% if field.layout == 'list' %}
-	{{ editlist(field.fields, data[field.name]) }}
+	{{ editlist(fieldname, field.fields, data[field.name]) }}
 	{% endif %}
 {% endif %}
 {% endmacro %}
@@ -34,7 +40,9 @@
 	<ul class="nav nav-tabs">
 		{% for sec in sections %}
 		<li class="nav-item">
-			<a class="nav-link {% if loop.first %}active{% endif %}" data-toggle="tab" href="#{{ sec.id }}">{{ sec.title }}</a>
+			<a class="nav-link {% if loop.first %}active{% endif %}" data-toggle="tab" href="#{{ sec.id }}">{{ sec.title }}
+			<span class="badge badge-danger"></span>
+			</a>
 		</li>
 		{% endfor %}
 	</ul>
@@ -57,13 +65,13 @@
 </div>
 {% endmacro %}
 
-{% macro editlist(fields, datalist=[]) %}
+{% macro editlist(name, fields, datalist=[]) %}
 <div class="table-responsive">
-	<table class="table product-discounts-edit">
+	<table class="table" editlist-table>
 		<thead>
 			<tr>
 				{% for field in fields %}
-				<th>{{ field.label }}</th>
+				<th {% if field.width|length %}style="width: {{ field.width }}"{% endif %}>{{ field.label }}</th>
 				{% endfor %}
 				<th></th>
 			</tr>
@@ -72,13 +80,30 @@
 			{% for data in datalist %}
 			<tr>
 				{% for field in fields %}
-				<td>
-					{{ parseField(field, data) }}
+				<td editlist-field="{{ field.name }}">
+					{{ parseField(field, data, noname=true) }}
 				</td>
 				{% endfor %}
+				<td>
+					<a href="javascript:void(0)" class="btn btn-outline-danger md-btn-flat icon-btn btn-sm" editlist-remove-btn><i class="ion ion-md-close"></i></a>
+				</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 </div>
+{{ forms.hiddenfield(name, valueprop='_value') }}
+<template>
+	<tr>
+		{% for field in fields %}
+		<td editlist-field="{{ field.name }}">
+			{{ parseField(field, noname=true) }}
+		</td>
+		{% endfor %}
+		<td>
+			<a href="javascript:void(0)" class="btn btn-outline-danger md-btn-flat icon-btn btn-sm" editlist-remove-btn><i class="ion ion-md-close"></i></a>
+		</td>
+	</tr>
+</template>
+<button type="button" class="btn btn-outline-primary" editlist-add-btn><i class="ion ion-md-add"></i></button>
 {% endmacro %}

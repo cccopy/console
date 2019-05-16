@@ -113,17 +113,20 @@
 						{
 							"name": "label",
 							"type": "string",
-							"label": "標籤"
+							"label": "標籤",
+							"width": "10%"
 						},
 						{
 							"name": "image",
 							"type": "image",
-							"label": "圖片"
+							"label": "圖片",
+							"width": "20%"
 						},
 						{
 							"name": "description",
 							"type": "text",
-							"label": "敍述文字"
+							"label": "敍述文字",
+							"width": "65%"
 						}
 					],
 					"label": "劇本結構",

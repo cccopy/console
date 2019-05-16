@@ -1,0 +1,12 @@
+
+.text-medium{
+	font-size: 120% !important;
+}
+
+label[image-field]{
+	cursor: pointer;
+}
+
+label[image-field] input[type=file]{
+	display: none;
+}

@@ -1,0 +1,5 @@
+
+button[status="normal"] span:not([status-normal]),
+button[status="loading"] span:not([status-loading]){
+	display: none;
+}
