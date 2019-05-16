@@ -5,7 +5,7 @@
   "repository": "https://github.com/cccopy/console.git",
   "main": "server/index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development supervisor server/index.js",
+    "dev": "cross-env NODE_ENV=development supervisor -i assets server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "videoarmy",
