@@ -90,7 +90,11 @@ module.exports = function(app, passport) {
             if(f.name) console.log(req.body[f.name]);
         });
 
-        res.redirect('/items/');
+        if (req.xhr) {
+            res.send({ url: '/items/' });
+        } else {
+            res.redirect('/items/');
+        }
     });
 
     app.get('/items/', loginRequired, function(req, res){

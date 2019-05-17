@@ -20,14 +20,16 @@
 
 {% block innerContent %}
 <h4 class="font-weight-bold py-3 mb-4">項目新增</h4>
+<form method="POST">
 	{% if layouts.layout == 'tabs' %}
 	{{ container.tabs(layouts.sections, data) }}
 	{% endif %}
-<div class="text-right mt-3">
-	<button type="button" class="btn btn-primary" container-save method="post" status="normal">
-		<span status-normal>儲存</span>
-		<span status-loading class="spinner-border" role="status" aria-hidden="true"></span>
-        <span status-loading>處理中...</span>
-	</button>
-</div>
+	<div class="text-right mt-3">
+		<button type="button" class="btn btn-primary" container-save status="normal">
+			<span status-normal>儲存</span>
+			<span status-loading class="spinner-border" role="status" aria-hidden="true"></span>
+	        <span status-loading>處理中...</span>
+		</button>
+	</div>
+</form>
 {% endblock %}

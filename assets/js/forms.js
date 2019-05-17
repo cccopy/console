@@ -24,41 +24,79 @@ $(function() {
 // editlist add/remove
 $(function(){
 
-	function loadFile(input, output){
+	function loadFile(input, img, hidden){
 		var reader = new FileReader();
 		reader.onload = function(){
-			output.src = reader.result;
+			img.src = reader.result;
+			hidden.value = reader.result;
 		};
 		reader.readAsDataURL(input.files[0]);
+	}
+
+	function rearrangeIndex(table){
+		var startIdx = table._newEntryStartIdx;
+		var namePrefix = table._namePrefix;
+
+		table._newers.forEach(function(trel, idx){
+			$(trel).find("[name]").each(function(nidx, nel){
+				$(nel).attr("name", namePrefix + "[" + (idx + startIdx) + "][" + nel._originName + "]");
+			});
+		});
 	}
 
 	// initailize fields in editlist
 	function initListField(trEl){
 		// used if update page
 		$(trEl).find('a[editlist-remove-btn]').click(function(){
-			$(this).parents("tr").remove();
+			var $curTrEl = $(this).closest("tr"),
+				curTrEl = $curTrEl.get(0),
+				table = $curTrEl.closest("table").get(0),
+				tridx;
+
+			if ( ( tridx = table._newers.indexOf($curTrEl.get(0)) ) != -1) {
+				table._newers.splice(tridx, 1);
+				// rearrange index
+				rearrangeIndex(table);
+			}
+			$curTrEl.remove();
 		});
 
 		$(trEl).find("label[image-field] input[type=file]").on('change', function(){
 			var self = this;
 			var img = $(self).siblings("img").get(0);
+			var hidden = $(self).siblings("input[type=hidden]").get(0);
 			if (self.files && self.files[0]) {
-				loadFile(self, img);
+				loadFile(self, img, hidden);
 			}
+		});
+
+		$(trEl).find("[name]").each(function(nidx, nel){
+			nel._originName = $(nel).attr("name");
 		});
 	}
 
 	// editlist-add-btn
 	$('button[editlist-add-btn]').click(function(){
 		var $selfBtn = $(this),
-			addTarget = $selfBtn.siblings("div").find("table tbody"),
+			table = $selfBtn.siblings("div").find("table").get(0),
+			addTarget = $(table).children("tbody"),
 			templateContent = $selfBtn.siblings("template").get(0).content;
 		addTarget.append( document.importNode(templateContent, true) );
-		initListField(addTarget.children().last());
+
+		var trEl = addTarget.children().last();
+
+		table._newers.push(trEl.get(0));
+
+		initListField(trEl);
+		// rearrange index
+		rearrangeIndex(table);
 	});
 
-	$('table[editlist-table] tbody tr').each(function(idx, el){
-		initListField(el);
+	$('table[editlist-table]').each(function(tidx, tel){
+		var trs = $(tel).find("tbody > tr");
+		tel._newEntryStartIdx = trs.length;
+		tel._namePrefix = $(tel).attr("editlist-prefix");
+		tel._newers = [];
+		trs.each(function(cidx, cel){ initListField(cel); });
 	});
-
 });

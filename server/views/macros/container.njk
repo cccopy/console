@@ -1,10 +1,10 @@
 
 {% import "macros/form.njk" as forms %}
 
-{% macro parseField(field, data={}, noname=false) %}
+{% macro parseField(field, data={}, aryname='', aryidx='') %}
 {% set fieldname = field.name %}
-{% if noname %}
-	{% set fieldname = '' %}
+{% if aryname|length %}
+	{% set fieldname = aryname + "[" + aryidx + "][" + field.name + "]" %}
 {% endif %}
 {% if field.type == 'string' %}
 	{% set placeholder = field|getPlace %}
@@ -67,7 +67,7 @@
 
 {% macro editlist(name, fields, datalist=[]) %}
 <div class="table-responsive">
-	<table class="table" editlist-table>
+	<table class="table" editlist-table editlist-prefix="{{ name }}">
 		<thead>
 			<tr>
 				{% for field in fields %}
@@ -78,10 +78,11 @@
 		</thead>
 		<tbody>
 			{% for data in datalist %}
+			{% set didx = loop.index0 %}
 			<tr>
 				{% for field in fields %}
-				<td editlist-field="{{ field.name }}">
-					{{ parseField(field, data, noname=true) }}
+				<td>
+					{{ parseField(field, data, aryname=name, aryidx=didx) }}
 				</td>
 				{% endfor %}
 				<td>
@@ -92,12 +93,11 @@
 		</tbody>
 	</table>
 </div>
-{{ forms.hiddenfield(name, valueprop='_value') }}
 <template>
 	<tr>
 		{% for field in fields %}
-		<td editlist-field="{{ field.name }}">
-			{{ parseField(field, noname=true) }}
+		<td>
+			{{ parseField(field) }}
 		</td>
 		{% endfor %}
 		<td>

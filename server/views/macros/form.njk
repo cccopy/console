@@ -5,8 +5,8 @@
 {% endif %}
 {% endmacro %}
 
-{% macro hiddenfield(name, value='', valueprop='') %}
-<input type="hidden" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" valueprop="{{ valueprop }}">
+{% macro hiddenfield(name, value='', prop='') %}
+<input type="hidden" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" {% if prop|length %}{{ prop }}{% endif %}>
 {% endmacro %}
 
 {% macro textfield(name, label='', value='', placeholder='', tip='') %}	
@@ -41,13 +41,14 @@
 		{% set imgurl = value %}
 	{% endif %}
 	<img src="{{ imgurl }}" alt="" class="img-fluid">
-	<input type="file" accept="image/*" {% if name|length %}name="{{ name }}"{% endif %}>
+	<input type="file" accept="image/*">
+	{{ hiddenfield(name, prop='valuefor=siblings-img-src') }}
 </label>
 {% endmacro %}
 
 {% macro tagsselection(name, label='', options=[], tip='', autoCreate=false) %}
 {% if label|length %}{{ label }}{% endif %}
-<select {% if name|length %}name="{{ name }}"{% endif %} class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %}>
+<select {% if name|length %}name="{{ name + '[]' }}"{% endif %} class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %}>
 	{% for opt in options %}
 	<option value="{{ opt.value }}" {% if opt.selected == true %}selected{% endif %}>{{ opt.label }}</option>
     {% endfor %}
