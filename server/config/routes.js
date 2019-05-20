@@ -9,6 +9,7 @@ var isDev = process.env.NODE_ENV === 'development';
 
 // views model
 var menus = require('../models/menus.config.json');
+var widgets = require('../models/widgets.config.json');
 var createLayout = require('../models/items/create.config.json');
 
 // route middleware to make sure a user is logged in
@@ -45,6 +46,7 @@ module.exports = function(app, passport) {
 
     nunEnv.addGlobal("menus", menus);
 
+    nunEnv.addGlobal("widgets", widgets);
 
     // =====================================
     // Static Files ========================

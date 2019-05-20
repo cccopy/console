@@ -36,7 +36,7 @@
 <label class="img-thumbnail img-thumbnail-shadow" image-field>
 	<span class="img-thumbnail-overlay bg-white opacity-75"></span>
 	<span class="img-thumbnail-content text-secondary text-medium">{{ label }}</span>
-	{% set imgurl = '/assets/img/empty.png' %}
+	{% set imgurl = widgets.image.empty %}
 	{% if value|length %}
 		{% set imgurl = value %}
 	{% endif %}
