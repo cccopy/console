@@ -143,9 +143,21 @@
 					"type": "json",
 					"label": "影片網址或圖片",
 					"required": true,
-					"layout": "list",
-					"fields": ["string"],
-					"formats": ["string", "image"]
+					"layout": "media-sort-list",
+					"fields": [
+						{
+							"name": "url",
+							"type": "string",
+							"layout": "button",
+							"label": "影片網址"
+						},
+						{
+							"name": "image",
+							"type": "image-file",
+							"layout": "button",
+							"label": "圖片"
+						}
+					]
 				}
 			]
 		},

@@ -1,14 +1,21 @@
 
 {% import "macros/form.njk" as forms %}
 
-{% macro parseField(field, data={}, aryname='', aryidx='') %}
+{% macro parseField(field, data={}, aryname='', aryidx='', noname=false) %}
 {% set fieldname = field.name %}
 {% if aryname|length %}
 	{% set fieldname = aryname + "[" + aryidx + "][" + field.name + "]" %}
 {% endif %}
+{% if noname %}
+	{% set fieldname = '' %}
+{% endif %}
 {% if field.type == 'string' %}
 	{% set placeholder = field|getPlace %}
-	{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+	{% if field.layout == 'button' %}
+		{{ forms.textbutton(fieldname, label=field.label, placeholder=placeholder) }}
+	{% else %}
+		{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+	{% endif %}
 {% elif field.type == 'text' %}
 	{% set placeholder = field|getPlace %}
 	{{ forms.textareafield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
@@ -25,7 +32,9 @@
 	{{ forms.tagsselection(fieldname, tip=field.tip, options=data[field.related], autoCreate=field.autoCreate) }}
 {% elif field.type == 'json' %}
 	{% if field.layout == 'list' %}
-	{{ editlist(fieldname, field.fields, data[field.name]) }}
+		{{ editlist(fieldname, field.fields, data[field.name]) }}
+	{% elif field.layout == 'media-sort-list' %}
+		{{ mediasortlist(fieldname, field.fields, data[field.name]) }}
 	{% endif %}
 {% endif %}
 {% endmacro %}
@@ -112,4 +121,29 @@
 	</tr>
 </template>
 <button type="button" class="btn btn-outline-primary" editlist-add-btn><i class="ion ion-md-add"></i></button>
+{% endmacro %}
+
+{% macro mediasortlist(name, fields, datalist=[]) %}
+<div class="row mb-3">
+</div>
+<template type="main-wrap">
+	<div class="media align-items-center bg-white ui-bordered col-md-3">
+		<div class="ion ion-ios-move text-muted text-big p-3"></div>
+		<a href="javascript:void(0)" class="d-block ui-w-120 mr-2"></a>
+		<button type="button" class="btn btn-outline-danger borderless icon-btn d-block"><i class="ion ion-md-close"></i></button>
+	</div>
+</template>
+<template type="image-file">
+	<img src="" class="img-fluid" alt="">
+</template>
+<template type="text">
+	<iframe src="" width="100%" height="auto"></iframe>
+</template>
+<div class="form-inline" mediasortlist-inputs>
+{% for field in fields %}
+	<div class="input-group" map-tpl="{{ field.type }}" map-name="{{ field.name }}">
+	{{ parseField(field, noname=true) }}
+	</div>
+{% endfor %}
+</div>
 {% endmacro %}

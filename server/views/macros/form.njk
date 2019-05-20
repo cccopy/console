@@ -47,6 +47,18 @@
 </label>
 {% endmacro %}
 
+{% macro imagefilebutton(name, label='選擇圖片') %}
+<label class="btn btn-outline-primary" image-field>
+	<span><i class="ion ion-md-add"></i> {{ label }}</span>
+	<input type="file" accept="image/*">
+</label>
+{% endmacro %}
+
+{% macro textbutton(name, label='', placeholder='') %}
+{{ textfield(name, placeholder=placeholder) }}
+<button type="button" class="btn btn-outline-primary"><i class="ion ion-md-add"></i> {{ label }}</button>
+{% endmacro %}
+
 {% macro tagsselection(name, label='', options=[], tip='', autoCreate=false) %}
 {% if label|length %}{{ label }}{% endif %}
 <select {% if name|length %}name="{{ name + '[]' }}"{% endif %} class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %}>

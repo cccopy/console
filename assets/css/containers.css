@@ -1,0 +1,9 @@
+
+[mediasortlist-inputs] > * {
+	margin-right: .5rem !important;
+}
+
+.ui-w-120 {
+    width: 120px !important;
+    height: auto;
+}
