@@ -1,4 +1,5 @@
 {
-	"getUser": "adminusers",
-	"getItem": "items"
+	"users": "adminusers",
+	"items": "items",
+	"upload": "upload"
 }

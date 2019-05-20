@@ -5,6 +5,13 @@ const fs = require('fs');
 const uuidv4 = require('uuid/v4');
 const strkey = require('../config/constants.json').sessionKey;
 
+var s3re = new RegExp("^.+amazonaws\\.com/(.+)$");
+
+function isDataURL(s) {
+    return !!s.match(isDataURL.regex);
+}
+isDataURL.regex = /^\s*data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)?)?(;base64)?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*)\s*$/i;
+
 exports.getCookie = function(req){
 	var res = null,
 		cookiePairs = [];
@@ -55,5 +62,15 @@ exports.base64_encode = function(file){
     var bitmap = fs.readFileSync(file);
     // convert binary data to base64 encoded string
     return new Buffer(bitmap).toString('base64');
+};
+
+exports.isDataURL = isDataURL;
+
+exports.convertS3Url = function(s3url){
+	var matches;
+	if ( matches = s3url.match(s3re) ) {
+		return "https://" + matches[1];
+	}
+	return s3url;
 };
 

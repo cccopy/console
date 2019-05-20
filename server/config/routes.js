@@ -6,6 +6,7 @@ var utils = require('../services/utils');
 var interface = require('../services/interface');
 var nunjucks = require('nunjucks');
 var isDev = process.env.NODE_ENV === 'development';
+var _ = require('lodash');
 
 // views model
 var menus = require('../models/menus.config.json');
@@ -64,18 +65,7 @@ module.exports = function(app, passport) {
     // =====================================
     app.get('/items/create', loginRequired, function(req, res){
         res.render('items/create', { 
-            path: '/items/create', layouts: createLayout, 
-            data: {
-                keywords: [
-                    { value: "test1", label: "TEST1"},
-                    { value: "test2", label: "TEST2"},
-                    { value: "test3", label: "TEST3", selected: true},
-                    { value: "test4", label: "TEST4"}
-                ],
-                scenario: [
-                    { label: "爛", description: "shit" }
-                ]
-            }
+            path: '/items/create', layouts: createLayout
         } );
     });
     app.post('/items/create', loginRequired, function(req, res){
@@ -88,15 +78,70 @@ module.exports = function(app, passport) {
         } else {
             fields = layouts.fields;
         }
-        fields.forEach(function(f){
-            if(f.name) console.log(req.body[f.name]);
+        let mutableData = _.cloneDeep(req.body);
+        let shouldUploads = [];
+        fields.forEach(function(fd){
+            if (fd.type == "json") {
+                let targetVal = mutableData[fd.name];
+                if ( Array.isArray(targetVal) ) {
+                    // find the files fields
+                    let fileNames = _.map(
+                        _.filter(fd.fields, inf => { 
+                            return inf.type == "image" || inf.type == "file";
+                        }),
+                        o => o.name
+                    );
+                    // find file field in json and collect them
+                    _.each(fileNames, name => {
+                        _.each(mutableData[fd.name], tuple => {
+                            const val = tuple[name];
+                            if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
+                                shouldUploads.push( { with: name, data: tuple } );
+                            }
+                        })
+                    });
+                } else if (typeof targetVal == "undefined" || targetVal == "") {
+                    // defaults
+                    mutableData[fd.name] = {};
+                }
+            }
         });
 
-        if (req.xhr) {
-            res.send({ url: '/items/' });
-        } else {
-            res.redirect('/items/');
+        var toUploads = shouldUploads.map(function(o){
+            return o.data[o.with];
+        });
+
+        var postChain = Promise.resolve();
+        if ( toUploads.length ) {
+            postChain = interface.uploadFiles(toUploads, "items")
+                .then(function(results){
+                    _.each(results, function(result, idx){
+                        let o = shouldUploads[idx];
+                        // override
+                        o.data[o.with] = {
+                            id: result.id,
+                            name: result.name,
+                            mime: result.mime,
+                            size: result.size,
+                            url: utils.convertS3Url(result.url)
+                        };
+                    })
+                });
         }
+
+        postChain
+            .then(function(){
+                return interface.createItem(mutableData)
+            })
+            .then(function(result){
+                console.log(result);
+                if (req.xhr) {
+                    res.send({ url: '/items/' });
+                } else {
+                    res.redirect('/items/');
+                }
+            })
+            .catch(function(err){ console.log(err) });
     });
 
     app.get('/items/', loginRequired, function(req, res){
