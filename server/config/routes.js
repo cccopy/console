@@ -30,7 +30,7 @@ module.exports = function(app, passport) {
     });
 
     nunEnv.addFilter("isNamebase", function(path, compare){
-        return path.substr(0, compare.length) == compare;
+        return path && path.substr(0, compare.length) == compare;
     });
 
     nunEnv.addFilter("isItemActive", function(path, compare){
