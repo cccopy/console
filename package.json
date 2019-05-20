@@ -6,7 +6,7 @@
   "main": "server/index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development supervisor -i assets server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=development node server/test.js"
   },
   "author": "videoarmy",
   "license": "MIT",
@@ -21,10 +21,12 @@
     "cookie-parser": "^1.4.4",
     "express": "^4.16.4",
     "express-session": "^1.16.1",
+    "lodash": "^4.17.11",
     "md5": "^2.2.1",
     "nunjucks": "^3.2.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "request": "^2.88.0",
     "uuid": "^3.3.2"
   }
 }
