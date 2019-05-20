@@ -15,8 +15,12 @@
 {% elif field.type == 'integer' %}
 	{% set placeholder = field|getPlace %}
 	{{ forms.numberfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
-{% elif field.type == 'image' %}
-	{{ forms.imagefilefield(fieldname, value=data[field.name]) }}
+{% elif field.type == 'image-file' %}
+	{% if field.layout == 'button' %}
+		{{ forms.imagefilebutton(fieldname, label=field.label) }}
+	{% else %}
+		{{ forms.imagefilefield(fieldname, value=data[field.name]) }}
+	{% endif %}
 {% elif field.type == 'collection' and field.layout == 'tags-selection' %}
 	{{ forms.tagsselection(fieldname, tip=field.tip, options=data[field.related], autoCreate=field.autoCreate) }}
 {% elif field.type == 'json' %}

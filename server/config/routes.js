@@ -87,7 +87,7 @@ module.exports = function(app, passport) {
                     // find the files fields
                     let fileNames = _.map(
                         _.filter(fd.fields, inf => { 
-                            return inf.type == "image" || inf.type == "file";
+                            return inf.type == "image-file" || inf.type == "file";
                         }),
                         o => o.name
                     );

@@ -118,7 +118,7 @@
 						},
 						{
 							"name": "image",
-							"type": "image",
+							"type": "image-file",
 							"label": "圖片",
 							"width": "20%"
 						},
