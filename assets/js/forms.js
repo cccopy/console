@@ -36,10 +36,18 @@ $(function(){
 	function rearrangeIndex(table){
 		var startIdx = table._newEntryStartIdx;
 		var namePrefix = table._namePrefix;
-
+		var re = new RegExp("^([\\S]+)(\\[(.*)\\])$");
 		table._newers.forEach(function(trel, idx){
 			$(trel).find("[name]").each(function(nidx, nel){
-				$(nel).attr("name", namePrefix + "[" + (idx + startIdx) + "][" + nel._originName + "]");
+				var resultIdx = idx + startIdx, matches,
+					wrapName = ["[", "]"].join(nel._originName);
+				if ( matches = nel._originName.match(re) ) {
+					wrapName = ["[", "]"].join(matches[1]) + matches[2];
+				}
+				$(nel).attr("name", namePrefix + "[" + resultIdx + "]" + wrapName);
+				if ( nel._originName == '_idx' ) {
+					$(nel).val(resultIdx);
+				}
 			});
 		});
 	}
@@ -67,6 +75,7 @@ $(function(){
 			var hidden = $(self).siblings("input[type=hidden]").get(0);
 			if (self.files && self.files[0]) {
 				loadFile(self, img, hidden);
+				self._filename = self.files[0].name;
 			}
 		});
 

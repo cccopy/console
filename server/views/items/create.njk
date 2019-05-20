@@ -20,7 +20,7 @@
 
 {% block innerContent %}
 <h4 class="font-weight-bold py-3 mb-4">項目新增</h4>
-<form method="POST">
+<form method="POST" container-form>
 	{% if layouts.layout == 'tabs' %}
 	{{ container.tabs(layouts.sections, data) }}
 	{% endif %}
