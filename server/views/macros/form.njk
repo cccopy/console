@@ -5,8 +5,8 @@
 {% endif %}
 {% endmacro %}
 
-{% macro hiddenfield(name, value='', valuefor='') %}
-<input type="hidden" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" {% if valuefor|length %}valuefor="{{ valuefor }}"{% endif %}>
+{% macro hiddenfield(name, value='', valuefor='', prop='') %}
+<input type="hidden" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" {% if valuefor|length %}valuefor="{{ valuefor }}"{% endif %} {% if prop|length %}{{ prop }}{% endif %}>
 {% endmacro %}
 
 {% macro textfield(name, label='', value='', placeholder='', tip='') %}	
@@ -50,7 +50,7 @@
 {% macro imagefilebutton(name, label='選擇圖片') %}
 <label class="btn btn-outline-primary" image-field>
 	<span><i class="ion ion-md-add"></i> {{ label }}</span>
-	<input type="file" accept="image/*">
+	<input type="file" accept="image/*" multiple>
 </label>
 {% endmacro %}
 

@@ -1,34 +1,34 @@
 
-function loadFile(input, img, hidden){
+function loadFile(file, img, hidden){
 	var reader = new FileReader();
 	reader.onload = function(){
 		img.src = reader.result;
 		if (hidden) hidden.value = reader.result;
 	};
-	reader.readAsDataURL(input.files[0]);
+	reader.readAsDataURL(file);
+}
+
+function rearrangeIndex(container){
+	var startIdx = container._startIdx || 0;
+	var namePrefix = container._namePrefix;
+	var re = new RegExp("^([\\S]+)(\\[(.*)\\])$");
+	container._groups.forEach(function(unitel, idx){
+		$(unitel).find("[name]").each(function(nidx, nel){
+			var resultIdx = idx + startIdx, matches,
+				wrapName = ["[", "]"].join(nel._originName);
+			if ( matches = nel._originName.match(re) ) {
+				wrapName = ["[", "]"].join(matches[1]) + matches[2];
+			}
+			$(nel).attr("name", namePrefix + "[" + resultIdx + "]" + wrapName);
+			if ( nel._originName == '_idx' ) {
+				$(nel).val(resultIdx);
+			}
+		});
+	});
 }
 
 // editlist add/remove
 $(function(){
-
-	function rearrangeIndex(table){
-		var startIdx = table._newEntryStartIdx;
-		var namePrefix = table._namePrefix;
-		var re = new RegExp("^([\\S]+)(\\[(.*)\\])$");
-		table._newers.forEach(function(trel, idx){
-			$(trel).find("[name]").each(function(nidx, nel){
-				var resultIdx = idx + startIdx, matches,
-					wrapName = ["[", "]"].join(nel._originName);
-				if ( matches = nel._originName.match(re) ) {
-					wrapName = ["[", "]"].join(matches[1]) + matches[2];
-				}
-				$(nel).attr("name", namePrefix + "[" + resultIdx + "]" + wrapName);
-				if ( nel._originName == '_idx' ) {
-					$(nel).val(resultIdx);
-				}
-			});
-		});
-	}
 
 	// initailize fields in editlist
 	function initListField(trEl){
@@ -39,8 +39,8 @@ $(function(){
 				table = $curTrEl.closest("table").get(0),
 				tridx;
 
-			if ( ( tridx = table._newers.indexOf($curTrEl.get(0)) ) != -1) {
-				table._newers.splice(tridx, 1);
+			if ( ( tridx = table._groups.indexOf($curTrEl.get(0)) ) != -1) {
+				table._groups.splice(tridx, 1);
 				// rearrange index
 				rearrangeIndex(table);
 			}
@@ -52,7 +52,7 @@ $(function(){
 			var img = $(self).siblings("img").get(0);
 			var hidden = $(self).siblings("input[type=hidden]").get(0);
 			if (self.files && self.files[0]) {
-				loadFile(self, img, hidden);
+				loadFile(self.files[0], img, hidden);
 				self._filename = self.files[0].name;
 			}
 		});
@@ -72,7 +72,7 @@ $(function(){
 
 		var trEl = addTarget.children().last();
 
-		table._newers.push(trEl.get(0));
+		table._groups.push(trEl.get(0));
 
 		initListField(trEl);
 		// rearrange index
@@ -81,9 +81,9 @@ $(function(){
 
 	$('table[editlist-table]').each(function(tidx, tel){
 		var trs = $(tel).find("tbody > tr");
-		tel._newEntryStartIdx = trs.length;
+		tel._startIdx = trs.length;
 		tel._namePrefix = $(tel).attr("editlist-prefix");
-		tel._newers = [];
+		tel._groups = [];
 		trs.each(function(cidx, cel){ initListField(cel); });
 	});
 });
@@ -91,25 +91,50 @@ $(function(){
 // media sort list
 $(function(){
 
-// mediasortlist-inputs
-
-	$('[mediasortlist-inputs]').each(function(){
+	$('[mediasortlist-inputs]').each(function(midx, mel){
 		var $self = $(this),
 			addTarget = $self.siblings(".row"),
 			tplMainContent = $self.siblings("template[type='main-wrap']").get(0).content;
 
+		dragula([addTarget.get(0)], {
+			moves: function(el, container, handle) {
+				return handle.classList.contains('sort-item-move');
+			},
+			direction: 'mixed'
+		});
+
+		mel._namePrefix = $self.attr("mediasortlist-prefix");
+		mel._groups = [];
+
 		$self.find("[map-tpl='image-file'] input[type=file]").on('change', function(){
-			if (this.files && this.files[0]) {
-				var tplInnerContent = $self.siblings("template[type='image-file']").get(0).content;
+			if (this.files) {
+				var tplInnerContent = $self.siblings("template[type='image-file']").get(0).content,
+					f = 0, fileLen = this.files.length;
 
-				addTarget.append( document.importNode(tplMainContent, true) );
+				for( ; f < fileLen; f++ ){
+					var file = this.files[f];
 
-				var newEl = addTarget.children().last(),
-					newAnchor = newEl.find('a');
+					addTarget.append( document.importNode(tplMainContent, true) );
 
-				newAnchor.append( document.importNode(tplInnerContent, true) );
+					var newEl = addTarget.children().last(),
+						newAnchor = newEl.find('a');
 
-				loadFile(this, newAnchor.find('img').get(0));
+					newAnchor.append( document.importNode(tplInnerContent, true) );
+
+					newAnchor.find('[image-file-name]').val(file.name);
+
+					newAnchor.find("[name]").each(function(nidx, nel){
+						nel._originName = $(nel).attr("name");
+					});
+
+					loadFile(file, newAnchor.find('img').get(0));
+
+					mel._groups.push(newAnchor);
+				}
+
+				if ( fileLen ) {
+					rearrangeIndex(mel);
+				}
 			}
 		});
 	});
