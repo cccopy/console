@@ -27,6 +27,15 @@ function rearrangeIndex(container){
 	});
 }
 
+function getYoutubeThumbnail(url){
+	var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
+	var match = url.match(regExp);
+    if (match && match[2].length == 11) {
+    	return "https://img.youtube.com/vi/" + match[2] + "/0.jpg";
+    }
+    return "";
+}
+
 // editlist add/remove
 $(function(){
 
@@ -96,15 +105,63 @@ $(function(){
 			addTarget = $self.siblings(".row"),
 			tplMainContent = $self.siblings("template[type='main-wrap']").get(0).content;
 
-		dragula([addTarget.get(0)], {
+		mel._namePrefix = $self.attr("mediasortlist-prefix");
+		mel._groups = [];
+
+		var drake = dragula([addTarget.get(0)], {
 			moves: function(el, container, handle) {
 				return handle.classList.contains('sort-item-move');
 			},
 			direction: 'mixed'
 		});
 
-		mel._namePrefix = $self.attr("mediasortlist-prefix");
-		mel._groups = [];
+		drake.on("drop", function(){ 
+			// force rearrange group
+			mel._groups = [];
+			addTarget.children().each(function(){
+				mel._groups.push(this);
+			});
+			rearrangeIndex(mel);
+		});
+
+		// init remove event
+		addTarget.children().each(wrapBind);
+		
+		function wrapBind(){
+			mel._groups.push(this);
+			// remove event
+			$(this).children("button").click(function(){
+				var $curMediaEl = $(this).closest(".media"),
+					curMediaEl = $curMediaEl.get(0),
+					mediaIdx;
+
+				if ( ( mediaIdx = mel._groups.indexOf(curMediaEl) ) != -1) {
+					mel._groups.splice(mediaIdx, 1);
+					rearrangeIndex(mel);
+				}
+				$curMediaEl.remove();
+			});
+		}
+
+		function addNewAnchor(inner){
+			addTarget.append( document.importNode(tplMainContent, true) );
+
+			var $newEl = addTarget.children().last(),
+				newAnchor = $newEl.find('a'),
+				newEl = $newEl.get(0);
+
+			newAnchor.append( document.importNode(inner, true) );
+
+			newAnchor.find("[name]").each(function(nidx, nel){
+				nel._originName = $(nel).attr("name");
+			});
+
+			wrapBind.call(newEl);
+
+			rearrangeIndex(mel);
+
+			return newAnchor;
+		}
 
 		$self.find("[map-tpl='image-file'] input[type=file]").on('change', function(){
 			if (this.files) {
@@ -114,27 +171,32 @@ $(function(){
 				for( ; f < fileLen; f++ ){
 					var file = this.files[f];
 
-					addTarget.append( document.importNode(tplMainContent, true) );
-
-					var newEl = addTarget.children().last(),
-						newAnchor = newEl.find('a');
-
-					newAnchor.append( document.importNode(tplInnerContent, true) );
-
-					newAnchor.find('[image-file-name]').val(file.name);
-
-					newAnchor.find("[name]").each(function(nidx, nel){
-						nel._originName = $(nel).attr("name");
-					});
+					var newAnchor = addNewAnchor(tplInnerContent);
 
 					loadFile(file, newAnchor.find('img').get(0));
 
-					mel._groups.push(newAnchor);
+					newAnchor.find('[image-file-name]').val(file.name);
 				}
+			}
+		});
 
-				if ( fileLen ) {
-					rearrangeIndex(mel);
+		$self.find("[map-tpl='string'] button").click(function(){
+			var textSource = $(this).siblings("input");
+			if (textSource.val()){
+				var tplInnerContent = $self.siblings("template[type='string']").get(0).content,
+					url = textSource.val();
+
+				var newAnchor = addNewAnchor(tplInnerContent);
+
+				newAnchor.find('[string-url]').val(url);
+
+				var thumbnailUrl = getYoutubeThumbnail(url);
+				if (thumbnailUrl) {
+					newAnchor.find('img').attr('src', thumbnailUrl);
+				} else {
+					// ...
 				}
+				textSource.val("");	// reset
 			}
 		});
 	});

@@ -129,7 +129,7 @@
 <template type="main-wrap">
 	<div class="media align-items-center bg-white ui-bordered col-md-3">
 		<div class="sort-item-move ion ion-ios-move text-muted text-big p-3"></div>
-		<a href="javascript:void(0)" class="d-block ui-w-120 mr-2"></a>
+		<a href="javascript:void(0)" class="d-block ui-w-120 mr-2 position-relative media-preview"></a>
 		<button type="button" class="btn btn-outline-danger borderless icon-btn d-block"><i class="ion ion-md-close"></i></button>
 	</div>
 </template>
@@ -140,10 +140,11 @@
 		{{ forms.hiddenfield(field.name + '[name]', prop='image-file-name') }}
 		{{ forms.hiddenfield(field.name + '[dataurl]', valuefor='siblings(img).src') }}
 	</template>
-	{% elif field.type == 'text' %}
+	{% elif field.type == 'string' %}
 	<template type="{{ field.type }}">
-		<iframe src="" width="100%" height="auto"></iframe>
-		{{ forms.hiddenfield(field.name, valuefor='siblings(iframe).src') }}
+		<span class="position-absolute media-float-icon ion ion-ios-videocam text-large text-white"></span>
+		<img src="" class="img-fluid" alt="">
+		{{ forms.hiddenfield(field.name, prop='string-url') }}
 	</template>
 	{% endif %}
 {% endfor %}

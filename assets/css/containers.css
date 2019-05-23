@@ -11,3 +11,13 @@
 .sort-item-move{
 	cursor: pointer;
 }
+
+.media span.media-float-icon{
+	right: 5%;
+	bottom: 5%;
+}
+
+.media a.media-preview{
+	text-decoration : none;
+	cursor: default;
+}
