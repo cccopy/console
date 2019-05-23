@@ -11,7 +11,9 @@ var _ = require('lodash');
 // views model
 var menus = require('../models/menus.config.json');
 var widgets = require('../models/widgets.config.json');
+
 var createLayout = require('../models/items/create.config.json');
+var _listLayout = require('../models/items/_list.config.json');
 
 // route middleware to make sure a user is logged in
 function loginRequired(req, res, next) {
@@ -21,6 +23,15 @@ function loginRequired(req, res, next) {
 
     // if they aren't redirect them to the home page
     res.redirect('/login?next=' + encodeURIComponent(req.originalUrl) );
+}
+
+function getYoutubeThumbnail(url){
+    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match && match[2].length == 11) {
+        return "https://img.youtube.com/vi/" + match[2] + "/0.jpg";
+    }
+    return "";
 }
 
 module.exports = function(app, passport) {
@@ -45,8 +56,16 @@ module.exports = function(app, passport) {
         return opt.placeholder || opt.label || "";
     });
 
-    nunEnv.addGlobal("menus", menus);
+    nunEnv.addFilter("dataTransfer", function(target, tupleData){
+        var result = target,
+            matches;
+        while( matches = nunUrlRe.exec(target) ) {
+            result = result.replace(matches[0], tupleData[matches[1]]);
+        }
+        return result;
+    });
 
+    nunEnv.addGlobal("menus", menus);
     nunEnv.addGlobal("widgets", widgets);
 
     // =====================================
@@ -145,7 +164,34 @@ module.exports = function(app, passport) {
     });
 
     app.get('/items/', loginRequired, function(req, res){
-        res.render('items/_list', { path: '/items/' } );
+        var fields = _listLayout.fields;
+        var transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+        interface.getItems()
+            .then(function(results){
+                // do decode here
+                var mutableData = _.cloneDeep(results);
+                _.each(mutableData, function(result){
+                    _.each(transferFields, function(fd){
+                        var datalist = result[fd.name] || [];
+                        var mutableList = _.map(datalist, function(data){
+                            if (data.image) {
+                                return { src: data.image.url, link: data.image.url, type: 'image' };
+                            } else if (data.url) {
+                                return { src: getYoutubeThumbnail(data.url), link: data.url, type: 'video' };
+                            }
+                        });
+                        result[fd.name] = mutableList;
+                    });
+                });
+                console.log(mutableData);
+                res.render('items/_list', { path: '/items/', layouts: _listLayout, data: mutableData });
+            })
+            .catch(function(err){ 
+                if (err.status) {
+                    res.status(err.status).send(err.statusText);
+                }
+                console.log(err);
+            });
     });
 
     // =====================================

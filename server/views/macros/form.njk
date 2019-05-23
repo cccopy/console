@@ -54,6 +54,27 @@
 </label>
 {% endmacro %}
 
+{% macro imageview(src, link, icon='') %}
+<a href="{{ link }}" class="d-block align-items-center ui-w-100 position-relative mr-2 mb-1">
+	{% if icon|length %}
+		{% set iconcls = 'image' %}
+		{% if icon == 'video' %}
+			{% set iconcls = 'videocam' %}
+		{% endif %}
+		<span class="position-absolute media-float-icon ion ion-ios-{{ iconcls }} text-large text-white"></span>
+	{% endif %}
+	<img src="{{ src }}" alt="" class="img-fluid">
+</a>
+{% endmacro %}
+
+{% macro imagelistview(datalist=[]) %}
+<div class="row">
+{% for data in datalist %}
+	{{ imageview(data.src, data.link, data.type) }}
+{% endfor %}
+</div>
+{% endmacro %}
+
 {% macro textbutton(name, label='', placeholder='') %}
 {{ textfield(name, placeholder=placeholder) }}
 <button type="button" class="btn btn-outline-primary"><i class="ion ion-md-add"></i> {{ label }}</button>

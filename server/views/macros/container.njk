@@ -1,6 +1,18 @@
 
 {% import "macros/form.njk" as forms %}
 
+{% macro parseCell(field, celldata, tupledata) %}
+{% if field.link|length %}
+<a href="{{ field.link | dataTransfer(tupledata) }}">{{ celldata }}</a>
+{% elif field.type == 'json' %}
+	{% if field.layout == 'imagelist' %}
+		{{ forms.imagelistview(celldata) }}
+	{% endif %}
+{% else %}
+{{ celldata }}
+{% endif %}
+{% endmacro %}
+
 {% macro parseField(field, data={}, aryname='', aryidx='', noname=false) %}
 {% set fieldname = field.name %}
 {% if aryname|length %}
@@ -157,3 +169,32 @@
 {% endfor %}
 </div>
 {% endmacro %}
+
+{% macro gridview(fields, datalist=[]) %}
+<div class="table-responsive">
+	<table class="gridview table table-striped table-bordered">
+		<thead>
+			<tr>
+				{% for field in fields %}
+				<th {% if field.width|length %}style="width: {{ field.width }}"{% endif %}>{{ field.label }}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+		{% if datalist|length %}
+			{% for data in datalist %}
+			<tr>
+				<!-- <th scope="row">1</th> -->
+				{% for field in fields %}
+				<td>
+					{{ parseCell(field, data[field.name], tupledata=data) }}
+				</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+		{% endif %}
+		</tbody>
+	</table>
+</div>
+{% endmacro %}
+

@@ -72,6 +72,18 @@ module.exports = {
 			.catch( err => { reject(err); });
 		});
 	},
+	getItems: function(offset, limit){
+		var params = {};
+		if (typeof offset !== "undefined") params._start = offset;
+		if (typeof limit !== "undefined") params._limit = limit;
+		return new Promise(function(resolve, reject){
+			axiosIns.get(methods.items, { params: params })
+				.then(function(response){
+					resolve(response.data);
+				})
+				.catch( err => reject(err) );
+		});
+	},
 	createItem: function(data){
 		return new Promise(function(resolve, reject){
 			axiosIns.post(methods.items, data)

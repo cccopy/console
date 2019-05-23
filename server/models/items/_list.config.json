@@ -1,0 +1,27 @@
+{
+	"layout": "grid",
+	"fields": [
+		{
+			"name": "id",
+			"label": "編號",
+			"width": "8%"
+		},
+		{
+			"name": "title",
+			"label": "項目標題",
+			"link": ":id/update"
+		},
+		{
+			"name": "productUrls",
+			"label": "影片或圖片",
+			"type": "json",
+			"layout": "imagelist",
+			"width": "55%"
+		},
+		{
+			"name": "price",
+			"label": "價格",
+			"width": "10%"
+		}
+	]
+}
