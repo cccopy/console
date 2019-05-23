@@ -136,6 +136,7 @@
 {% for field in fields %}
 	{% if field.type == 'image-file' %}
 	<template type="{{ field.type }}">
+		<span class="position-absolute media-float-icon ion ion-ios-image text-large text-white"></span>
 		<img src="" class="img-fluid" alt="">
 		{{ forms.hiddenfield(field.name + '[name]', prop='image-file-name') }}
 		{{ forms.hiddenfield(field.name + '[dataurl]', valuefor='siblings(img).src') }}
