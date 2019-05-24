@@ -127,6 +127,8 @@ $(function(){
 		// init remove event
 		addTarget.children().each(wrapBind);
 		
+		rearrangeIndex(mel);
+
 		function wrapBind(){
 			mel._groups.push(this);
 			// remove event
@@ -141,6 +143,10 @@ $(function(){
 				}
 				$curMediaEl.remove();
 			});
+
+			$(this).find("[name]").each(function(nidx, nel){
+				nel._originName = $(nel).attr("name");
+			});
 		}
 
 		function addNewAnchor(inner){
@@ -151,10 +157,6 @@ $(function(){
 				newEl = $newEl.get(0);
 
 			newAnchor.append( document.importNode(inner, true) );
-
-			newAnchor.find("[name]").each(function(nidx, nel){
-				nel._originName = $(nel).attr("name");
-			});
 
 			wrapBind.call(newEl);
 
