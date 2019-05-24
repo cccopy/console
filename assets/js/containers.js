@@ -206,6 +206,7 @@ $(function(){
 
 
 $(function(){
-	$(".gridview").dataTable();
+	var views = $(".gridview");
+	if (views.length) views.dataTable();
 });
 
