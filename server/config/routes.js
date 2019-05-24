@@ -209,6 +209,38 @@ module.exports = function(app, passport) {
                 console.log(err);
             });
     });
+    app.get('/items/:id/update', loginRequired, function(req, res){
+        var lookid = req.params.id;
+        var fields = collectFields(createLayout)
+        var transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+        interface.getItem({ id: lookid })
+            .then(function(results){
+                if (!results.length) return res.status(404).send("Not Found");
+                var mutableData = results[0];
+                _.each(transferFields, function(fd){
+                    _.each(mutableData[fd.name] || [], function(data){
+                        var imageFiles = _.filter(fd.fields, f => f.type == "image-file" );
+                        var strings = _.filter(fd.fields, f => f.type == "string" );
+                        _.each(imageFiles, function(f){
+                            if (data[f.name]) data[f.name] = data[f.name].url;
+                        });
+                        _.each(strings, function(f){
+                            if (data[f.name]) data[f.name] = getYoutubeThumbnail(data[f.name]);
+                        });
+                    });
+                });
+                res.render('items/_id/update', { path: '/items/' + lookid + '/update', 
+                    layouts: createLayout,
+                    data: mutableData
+                } );
+            })
+            .catch(function(err){ 
+                if (err.status) {
+                    res.status(err.status).send(err.statusText);
+                }
+                console.log(err);
+            });
+    });
 
     // =====================================
     // Authentication ======================

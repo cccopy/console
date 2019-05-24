@@ -137,6 +137,25 @@
 
 {% macro mediasortlist(name, fields, datalist=[]) %}
 <div class="row mb-3">
+	{% for data in datalist %}
+		<div class="media align-items-center bg-white ui-bordered col-md-3">
+		<div class="sort-item-move ion ion-ios-move text-muted text-big p-3"></div>
+		<a href="javascript:void(0)" class="d-block ui-w-120 mr-2 position-relative media-preview">
+		{% set didx = loop.index0 %}
+		{{ forms.hiddenfield('_order', value=didx) }}
+		{% for field in fields %}
+			{% if field.type == 'image-file' and data[field.name]|length %}
+				<span class="position-absolute media-float-icon ion ion-ios-image text-large text-white"></span>
+				<img src="{{ data[field.name] }}" class="img-fluid" alt="">
+			{% elif field.type == 'string' and data[field.name]|length %}
+				<span class="position-absolute media-float-icon ion ion-ios-videocam text-large text-white"></span>
+				<img src="{{ data[field.name] }}" class="img-fluid" alt="">
+			{% endif %}
+		{% endfor %}
+		</a>
+		<button type="button" class="btn btn-outline-danger borderless icon-btn d-block"><i class="ion ion-md-close"></i></button>
+		</div>	
+	{% endfor %}
 </div>
 <template type="main-wrap">
 	<div class="media align-items-center bg-white ui-bordered col-md-3">
