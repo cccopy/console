@@ -34,6 +34,16 @@ function getYoutubeThumbnail(url){
     return "";
 }
 
+function collectFields(layouts){
+    if (layouts.layout == "tabs") {
+        return layouts.sections
+            .map(function(sec){ return sec.fields; })
+            .reduce(function(f1, f2){ return f1.concat(f2) }, []);
+    } else {
+        return layouts.fields;
+    }
+}
+
 module.exports = function(app, passport) {
 
     var nunEnv = nunjucks.configure(app.get('views'), {
@@ -88,15 +98,7 @@ module.exports = function(app, passport) {
         } );
     });
     app.post('/items/create', loginRequired, function(req, res){
-        var layouts = createLayout;
-        var fields = [];
-        if (layouts.layout == "tabs") {
-            fields = layouts.sections
-                .map(function(sec){ return sec.fields; })
-                .reduce(function(f1, f2){ return f1.concat(f2) }, []);
-        } else {
-            fields = layouts.fields;
-        }
+        const fields = collectFields(createLayout);
         let mutableData = _.cloneDeep(req.body);
         let shouldUploads = [];
         fields.forEach(function(fd){
@@ -164,7 +166,7 @@ module.exports = function(app, passport) {
     });
 
     app.get('/items/', loginRequired, function(req, res){
-        var fields = _listLayout.fields;
+        var fields = collectFields(_listLayout);
         var transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
         interface.getItems()
             .then(function(results){
