@@ -52,6 +52,8 @@ module.exports = function(app, passport) {
         express: app
     });
 
+    var nunUrlRe = /:([^\s\/]+)/g;
+
     nunEnv.addFilter("isNamebase", function(path, compare){
         return path && path.substr(0, compare.length) == compare;
     });
