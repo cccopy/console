@@ -173,16 +173,28 @@ module.exports = function(app, passport) {
         interface.getItems()
             .then(function(results){
                 // do decode here
-                var mutableData = _.cloneDeep(results);
+                var mutableData = results;
                 _.each(mutableData, function(result){
                     _.each(transferFields, function(fd){
                         var datalist = result[fd.name] || [];
+                        var imageFiles = _.filter(fd.fields, f => f.type == "image-file" );
+                        var strings = _.filter(fd.fields, f => f.type == "string" );
                         var mutableList = _.map(datalist, function(data){
-                            if (data.image) {
-                                return { src: data.image.url, link: data.image.url, type: 'image' };
-                            } else if (data.url) {
-                                return { src: getYoutubeThumbnail(data.url), link: data.url, type: 'video' };
-                            }
+                            var newData = {};
+                            _.each(imageFiles, function(f){
+                                if (data[f.name]) {
+                                    newData.src = newData.link = data[f.name].url;
+                                    newData.type = 'image';
+                                }
+                            });
+                            _.each(strings, function(f){
+                                if (data[f.name]) {
+                                    newData.src = getYoutubeThumbnail(data[f.name]);
+                                    newData.link = data[f.name];
+                                    newData.type = 'video';
+                                }
+                            });
+                            return newData;
                         });
                         result[fd.name] = mutableList;
                     });

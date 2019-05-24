@@ -16,7 +16,17 @@
 			"label": "影片或圖片",
 			"type": "json",
 			"layout": "imagelist",
-			"width": "55%"
+			"width": "55%",
+			"fields": [
+				{
+					"name": "url",
+					"type": "string"
+				},
+				{
+					"name": "image",
+					"type": "image-file"
+				}
+			]
 		},
 		{
 			"name": "price",
