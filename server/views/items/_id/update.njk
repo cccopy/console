@@ -24,7 +24,7 @@
 
 {% block innerContent %}
 <h4 class="font-weight-bold py-3 mb-4">項目變更</h4>
-<form method="PUT" container-form>
+<form method="POST" container-form>
 	{% if layouts.layout == 'tabs' %}
 	{{ container.tabs(layouts.sections, data) }}
 	{% endif %}
@@ -34,6 +34,7 @@
 			<span status-loading class="spinner-border" role="status" aria-hidden="true"></span>
 	        <span status-loading>處理中...</span>
 		</button>
+		<input type="hidden" name="_M" value="PUT">
 	</div>
 </form>
 {% endblock %}

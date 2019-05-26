@@ -2,9 +2,11 @@ const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
 const session = require('express-session');
 const flash = require('connect-flash');
 const constants = require('./constants.json');
+
 
 module.exports = function (app, passport) {
 	var node_env = process.env.NODE_ENV;
@@ -38,6 +40,13 @@ module.exports = function (app, passport) {
 	app.use(cookieParser());
 	app.use(bodyParser.urlencoded({limit: '100mb', extended: true})); // for parsing application/x-www-form-urlencoded
 	app.use(bodyParser.json({limit: '100mb'}));
+	app.use(methodOverride(function (req, res) {
+		if (req.body && typeof req.body === 'object' && '_M' in req.body) {
+			var method = req.body._M;
+			delete req.body._M;
+			return method;
+		}
+	}));
 
 	if ( !isProduction ) {
 		app.use('/assets', express.static(path.join(__dirname, '../..', 'assets')));
