@@ -178,7 +178,7 @@ module.exports = function(app, passport) {
                     _.each(transferFields, function(fd){
                         var datalist = result[fd.name] || [];
                         var imageFiles = _.filter(fd.fields, f => f.type == "image-file" );
-                        var strings = _.filter(fd.fields, f => f.type == "string" );
+                        var strings = _.filter(fd.fields, f => f.type == "video-url" );
                         var mutableList = _.map(datalist, function(data){
                             var newData = {};
                             _.each(imageFiles, function(f){
@@ -220,7 +220,7 @@ module.exports = function(app, passport) {
                 _.each(transferFields, function(fd){
                     _.each(mutableData[fd.name] || [], function(data){
                         var imageFiles = _.filter(fd.fields, f => f.type == "image-file" );
-                        var strings = _.filter(fd.fields, f => f.type == "string" );
+                        var strings = _.filter(fd.fields, f => f.type == "video-url" );
                         _.each(imageFiles, function(f){
                             if (data[f.name]) data[f.name] = data[f.name].url;
                         });

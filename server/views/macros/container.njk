@@ -21,7 +21,7 @@
 {% if noname %}
 	{% set fieldname = '' %}
 {% endif %}
-{% if field.type == 'string' %}
+{% if field.type == 'string' or field.type == 'video-url' %}
 	{% set placeholder = field|getPlace %}
 	{% if field.layout == 'button' %}
 		{{ forms.textbutton(fieldname, label=field.label, placeholder=placeholder) }}
@@ -147,7 +147,7 @@
 			{% if field.type == 'image-file' and data[field.name]|length %}
 				<span class="position-absolute media-float-icon ion ion-ios-image text-large text-white"></span>
 				<img src="{{ data[field.name] }}" class="img-fluid" alt="">
-			{% elif field.type == 'string' and data[field.name]|length %}
+			{% elif field.type == 'video-url' and data[field.name]|length %}
 				<span class="position-absolute media-float-icon ion ion-ios-videocam text-large text-white"></span>
 				<img src="{{ data[field.name] }}" class="img-fluid" alt="">
 			{% endif %}
@@ -172,11 +172,11 @@
 		{{ forms.hiddenfield(field.name + '[name]', prop='image-file-name') }}
 		{{ forms.hiddenfield(field.name + '[dataurl]', valuefor='siblings(img).src') }}
 	</template>
-	{% elif field.type == 'string' %}
+	{% elif field.type == 'video-url' %}
 	<template type="{{ field.type }}">
 		<span class="position-absolute media-float-icon ion ion-ios-videocam text-large text-white"></span>
 		<img src="" class="img-fluid" alt="">
-		{{ forms.hiddenfield(field.name, prop='string-url') }}
+		{{ forms.hiddenfield(field.name, prop='video-url-string') }}
 	</template>
 	{% endif %}
 {% endfor %}

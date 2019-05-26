@@ -147,7 +147,7 @@
 					"fields": [
 						{
 							"name": "url",
-							"type": "string",
+							"type": "video-url",
 							"layout": "button",
 							"label": "影片網址"
 						},

@@ -182,15 +182,15 @@ $(function(){
 			}
 		});
 
-		$self.find("[map-tpl='string'] button").click(function(){
+		$self.find("[map-tpl='video-url'] button").click(function(){
 			var textSource = $(this).siblings("input");
 			if (textSource.val()){
-				var tplInnerContent = $self.siblings("template[type='string']").get(0).content,
+				var tplInnerContent = $self.siblings("template[type='video-url']").get(0).content,
 					url = textSource.val();
 
 				var newAnchor = addNewAnchor(tplInnerContent);
 
-				newAnchor.find('[string-url]').val(url);
+				newAnchor.find('[video-url-string]').val(url);
 
 				var thumbnailUrl = getYoutubeThumbnail(url);
 				if (thumbnailUrl) {

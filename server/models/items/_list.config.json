@@ -20,7 +20,7 @@
 			"fields": [
 				{
 					"name": "url",
-					"type": "string"
+					"type": "video-url"
 				},
 				{
 					"name": "image",
