@@ -44,6 +44,9 @@ function collectFields(layouts){
     }
 }
 
+function notFound(res){ res.status(404).send("Not found."); }
+function badRequest(res){ res.status(400).send("Bad request."); }
+
 module.exports = function(app, passport) {
 
     var nunEnv = nunjucks.configure(app.get('views'), {
@@ -167,7 +170,7 @@ module.exports = function(app, passport) {
             .catch(function(err){ console.log(err) });
     });
 
-    app.get('/items/', loginRequired, function(req, res){
+    app.get('/items/', loginRequired, function(req, res, next){
         var fields = collectFields(_listLayout);
         var transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
         interface.getItems()
@@ -199,23 +202,18 @@ module.exports = function(app, passport) {
                         result[fd.name] = mutableList;
                     });
                 });
-                console.log(mutableData);
                 res.render('items/_list', { path: '/items/', layouts: _listLayout, data: mutableData });
             })
-            .catch(function(err){ 
-                if (err.status) {
-                    res.status(err.status).send(err.statusText);
-                }
-                console.log(err);
-            });
+            .catch(next);
     });
-    app.get('/items/:id/update', loginRequired, function(req, res){
-        var lookid = req.params.id;
-        var fields = collectFields(createLayout)
-        var transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+    app.get('/items/:id/update', loginRequired, function(req, res, next){
+        var lookid = req.params.id,
+            fields = collectFields(createLayout),
+            transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+
         interface.getItem({ id: lookid })
             .then(function(results){
-                if (!results.length) return res.status(404).send("Not Found");
+                if (!results.length) return notFound(res);
                 var mutableData = results[0];
                 _.each(transferFields, function(fd){
                     _.each(mutableData[fd.name] || [], function(data){
@@ -234,12 +232,7 @@ module.exports = function(app, passport) {
                     data: mutableData
                 } );
             })
-            .catch(function(err){ 
-                if (err.status) {
-                    res.status(err.status).send(err.statusText);
-                }
-                console.log(err);
-            });
+            .catch(next);
     });
 
     // =====================================
