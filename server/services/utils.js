@@ -8,7 +8,7 @@ const strkey = require('../config/constants.json').sessionKey;
 var s3re = new RegExp("^.+amazonaws\\.com/(.+)$");
 
 function isDataURL(s) {
-    return !!s.match(isDataURL.regex);
+    return s && !!s.match(isDataURL.regex);
 }
 isDataURL.regex = /^\s*data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)?)?(;base64)?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*)\s*$/i;
 
