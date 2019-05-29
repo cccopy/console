@@ -107,6 +107,7 @@ module.exports = function(app, passport) {
         const fields = collectFields(createLayout);
         let mutableData = _.cloneDeep(req.body);
         let shouldUploads = [];
+        let fileHandler = new FileHandler("items");
         fields.forEach(function(fd){
             if (fd.type == "json") {
                 let targetVal = mutableData[fd.name];
@@ -123,7 +124,7 @@ module.exports = function(app, passport) {
                         _.each(mutableData[fd.name], tuple => {
                             const val = tuple[name];
                             if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
-                                shouldUploads.push( { with: name, data: tuple } );
+                                fileHandler.add(tuple, name);
                             }
                         })
                     });
@@ -133,41 +134,10 @@ module.exports = function(app, passport) {
                 }
             }
         });
-
-        var toUploads = shouldUploads.map(function(o){
-            return o.data[o.with];
-        });
-
-        var postChain = Promise.resolve();
-        if ( toUploads.length ) {
-            postChain = interface.uploadFiles(toUploads, "items")
-                .then(function(results){
-                    _.each(results, function(result, idx){
-                        let o = shouldUploads[idx];
-                        // override
-                        o.data[o.with] = {
-                            id: result.id,
-                            name: result.name,
-                            mime: result.mime,
-                            size: result.size,
-                            url: utils.convertS3Url(result.url)
-                        };
-                    })
-                });
-        }
-
-        postChain
-            .then(function(){
-                return interface.createItem(mutableData)
-            })
-            .then(function(result){
-                console.log(result);
-                if (req.xhr) {
-                    res.send({ url: '/items/' });
-                } else {
-                    res.redirect('/items/');
-                }
-            })
+        
+        fileHandler.exec()
+            .then(function(){ return interface.createItem(mutableData) })
+            .then(function(result){ res.redirect('/items/'); })
             .catch(function(err){ console.log(err) });
     });
 
