@@ -168,7 +168,7 @@ module.exports = function(app, passport) {
                                     newData.type = 'video';
                                 }
                             });
-                            return newData;
+                            return _.isEmpty(newData) ? data : newData;
                         });
                         result[fd.name] = mutableList;
                     });
