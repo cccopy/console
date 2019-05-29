@@ -211,6 +211,7 @@ module.exports = function(app, passport) {
         var lookid = req.params.id,
             fields = collectFields(createLayout),
             transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+            integerFields = _.filter(fields, function(fd){ return fd.type == "integer" });
 
         interface.getItem({ id: lookid })
             .then(function(results){
@@ -227,6 +228,9 @@ module.exports = function(app, passport) {
                             if (data[f.name]) data[f.name] = getYoutubeThumbnail(data[f.name]);
                         });
                     });
+                });
+                _.each(integerFields, function(fd){
+                    if (mutableData[fd.name] == 0) mutableData[fd.name] = '';
                 });
                 res.render('items/_id/update', { path: '/items/' + lookid + '/update', 
                     layouts: createLayout,
