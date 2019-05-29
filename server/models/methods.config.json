@@ -1,5 +1,8 @@
 {
 	"users": "adminusers",
 	"items": "items",
-	"upload": "upload"
+	"_files": {
+		"add": "upload",
+		"remove": "upload/files"
+	}
 }

@@ -12,7 +12,7 @@ var axiosIns = axios.create({
 });
 
 var uploadOptions = {
-	url: api.base + methods.upload,
+	url: api.base + methods._files.add,
 	method: 'POST',
 	headers: { "Authorization": "Bearer " + api.token }
 };
@@ -51,6 +51,13 @@ module.exports = {
 					}
 				}
 			});
+		});
+	},
+	removeFile: function(id){
+		return new Promise(function(resolve, reject){
+			axiosIns.delete(methods._files.remove + "/" + id)
+				.then(function(response){ resolve(response.data); })
+				.catch( err => reject(err) );
 		});
 	},
 	validUser: function(email, password){
