@@ -106,5 +106,12 @@ module.exports = {
 				.then(function(response){ resolve(response.data); })
 				.catch( err => reject(err) );
 		});
+	},
+	updateItem: function(id, data){
+		return new Promise(function(resolve, reject){
+			axiosIns.put(methods.items + "/" + id, data)
+				.then(function(response){ resolve(response.data); })
+				.catch( err => reject(err) );
+		});	
 	}
 }

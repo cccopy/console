@@ -7,6 +7,7 @@ var interface = require('../services/interface');
 var nunjucks = require('nunjucks');
 var isDev = process.env.NODE_ENV === 'development';
 var _ = require('lodash');
+var FileHandler = require('../services/file-handler');
 
 // views model
 var menus = require('../models/menus.config.json');
@@ -234,6 +235,68 @@ module.exports = function(app, passport) {
             })
             .catch(next);
     });
+
+    app.put('/items/:id/update', loginRequired, function(req, res, next){
+        const lookid = req.params.id;
+        const fields = collectFields(createLayout);
+        const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+        const fileHandler = new FileHandler("items");
+        let mutableData = _.cloneDeep(req.body);
+
+        interface.getItem({ id: lookid })
+            .then(function(results){
+                if (!results.length) return badRequest(res);
+
+                let old = results[0];
+
+                _.each(transferFields, fd => {
+                    if ( Array.isArray(old[fd.name]) ) {
+                        let handshakes = [];
+                        let oldList = old[fd.name].slice(0);
+                        _.each(mutableData[fd.name] || [], function(data){
+                            if ( typeof data._order !== "undefined" && oldList[data._order] ) {
+                                handshakes.push(oldList[data._order]);
+                                oldList.splice(parseInt(data._order), 1, undefined);
+                            } else handshakes.push(data);
+                        });
+
+                        let oldRemoves = oldList.filter(function(o){ return !!o; });
+                        let fileNames = _.map(
+                            _.filter(fd.fields, inf => { 
+                                return inf.type == "image-file" || inf.type == "file";
+                            }),
+                            o => o.name
+                        );
+                        // find file field in json and collect them
+                        _.each(fileNames, name => {
+                            _.each(handshakes, tuple => {
+                                const val = tuple[name];
+                                if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
+                                    fileHandler.add(tuple, name);
+                                }
+                            });
+                            _.each(oldRemoves, tuple => {
+                                const val = tuple[name];
+                                if ( typeof val == 'object' && val.id ) {
+                                    fileHandler.remove(tuple, name);
+                                }
+                            });
+                        });
+
+                        mutableData[fd.name] = handshakes;
+                    }
+                });
+                return fileHandler.exec();
+            })
+            .then(function(){
+                return interface.updateItem(lookid, mutableData);
+            })
+            .then(function(){
+                res.redirect('/items/');
+            })
+            .catch(next);
+    });
+
 
     // =====================================
     // Authentication ======================
