@@ -1,9 +1,8 @@
 
-function loadFile(file, img, hidden){
+function loadFile(file, img){
 	var reader = new FileReader();
 	reader.onload = function(){
 		img.src = reader.result;
-		if (hidden) hidden.value = reader.result;
 	};
 	reader.readAsDataURL(file);
 }
@@ -59,9 +58,8 @@ $(function(){
 		$(trEl).find("label[image-field] input[type=file]").on('change', function(){
 			var self = this;
 			var img = $(self).siblings("img").get(0);
-			var hidden = $(self).siblings("input[type=hidden]").get(0);
 			if (self.files && self.files[0]) {
-				loadFile(self.files[0], img, hidden);
+				loadFile(self.files[0], img);
 				self._filename = self.files[0].name;
 			}
 		});
