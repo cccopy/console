@@ -105,7 +105,7 @@
 			{% for data in datalist %}
 			{% set didx = loop.index0 %}
 			<tr>
-				{{ forms.hiddenfield(name + '[' + didx + '][_idx]', value=didx) }}
+				{{ forms.hiddenfield(name + '[' + didx + '][_order]', value=didx) }}
 				{% for field in fields %}
 				<td>
 					{{ parseField(field, data, aryname=name, aryidx=didx) }}
@@ -121,7 +121,6 @@
 </div>
 <template>
 	<tr>
-		{{ forms.hiddenfield('_idx') }}
 		{% for field in fields %}
 		<td>
 			{{ parseField(field) }}

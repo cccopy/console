@@ -225,22 +225,37 @@ module.exports = function(app, passport) {
 
                 _.each(transferFields, fd => {
                     if ( Array.isArray(old[fd.name]) ) {
-                        let handshakes = [];
                         let oldList = old[fd.name].slice(0);
-                        _.each(mutableData[fd.name] || [], function(data){
-                            if ( typeof data._order !== "undefined" && oldList[data._order] ) {
-                                handshakes.push(oldList[data._order]);
-                                oldList.splice(parseInt(data._order), 1, undefined);
-                            } else handshakes.push(data);
-                        });
-
-                        let oldRemoves = oldList.filter(function(o){ return !!o; });
                         let fileNames = _.map(
                             _.filter(fd.fields, inf => { 
                                 return inf.type == "image-file" || inf.type == "file";
                             }),
                             o => o.name
                         );
+
+                        let handshakes = _.map(mutableData[fd.name] || [], function(data){
+                            if ( typeof data._order !== "undefined" && oldList[data._order] ) {
+                                var orderIdx = parseInt(data._order);
+                                var theOld = oldList[orderIdx];
+                                // remove the prop
+                                delete data._order;
+
+                                _.each(fileNames, name => {
+                                    if ( data[name] && utils.isDataURL(data[name].dataurl) && theOld[name] && theOld[name].id ) {
+                                        fileHandler.remove(theOld, name);
+                                    }
+                                    else data[name] = theOld[name];
+                                });
+
+                                data = _.merge({}, theOld, data);
+
+                                oldList.splice(orderIdx, 1, undefined);
+                            }
+                            return data;
+                        });
+
+                        let oldRemoves = oldList.filter(function(o){ return !!o; });
+                        
                         // find file field in json and collect them
                         _.each(fileNames, name => {
                             _.each(handshakes, tuple => {
