@@ -50,7 +50,11 @@
 				{
 					"name": "keywords",
 					"type": "collection",
-					"related": "keywords",
+					"related": "keyword",
+					"valueMap": {
+						"label": "word",
+						"value": "id"
+					},
 					"label": "關鍵字",
 					"required": true,
 					"layout": "tags-selection",

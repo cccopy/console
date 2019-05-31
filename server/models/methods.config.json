@@ -4,5 +4,6 @@
 	"_files": {
 		"add": "upload",
 		"remove": "upload/files"
-	}
+	},
+	"keyword": "keywords"
 }

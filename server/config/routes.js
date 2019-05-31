@@ -8,6 +8,7 @@ var nunjucks = require('nunjucks');
 var isDev = process.env.NODE_ENV === 'development';
 var _ = require('lodash');
 var FileHandler = require('../services/file-handler');
+var pluralize = require('pluralize');
 
 // views model
 var menus = require('../models/menus.config.json');
@@ -35,6 +36,9 @@ function getYoutubeThumbnail(url){
     return "";
 }
 
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
 function collectFields(layouts){
     if (layouts.layout == "tabs") {
         return layouts.sections
@@ -99,9 +103,41 @@ module.exports = function(app, passport) {
     // CRUD Pages ==========================
     // =====================================
     app.get('/items/create', loginRequired, function(req, res){
-        res.render('items/create', { 
-            path: '/items/create', layouts: createLayout
-        } );
+        const fields = collectFields(createLayout);
+        const collectionFields = _.filter(fields, function(fd){ return fd.type == "collection" });
+        let relatedData = {};
+
+        let relatedPromises = collectionFields.map( fd => {
+            return interface["get" + capitalize(pluralize(fd.related))]()
+                .then( results => {
+                    let nextData = {};
+                    nextData[fd.related] = results;
+                    return nextData;
+                });
+        });
+        Promise.all(relatedPromises)
+            .then( results => {
+                _.each(results, result => {
+                    _.merge(relatedData, result);
+                });
+            })
+            .then( () => {
+                _.each(collectionFields, fd => {
+                    let relateds = relatedData[fd.related];
+                    relatedData[fd.related] = _.map(relateds, related => {
+                        let converted = {};
+                        _.each(_.keys(fd.valueMap), key => {
+                            converted[key] = related[fd.valueMap[key]];
+                        });
+                        return converted;
+                    });
+                });
+
+                res.render('items/create', { 
+                    path: '/items/create', layouts: createLayout, data: relatedData
+                } );
+            });
+
     });
     app.post('/items/create', loginRequired, function(req, res){
         const fields = collectFields(createLayout);

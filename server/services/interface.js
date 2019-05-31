@@ -113,5 +113,17 @@ module.exports = {
 				.then(function(response){ resolve(response.data); })
 				.catch( err => reject(err) );
 		});	
+	},
+	getKeywords: function(offset, limit){
+		var params = {};
+		if (typeof offset !== "undefined") params._start = offset;
+		if (typeof limit !== "undefined") params._limit = limit;
+		return new Promise(function(resolve, reject){
+			axiosIns.get(methods.keyword, { params: params })
+				.then(function(response){
+					resolve(response.data);
+				})
+				.catch( err => reject(err) );
+		});
 	}
 }
