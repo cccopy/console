@@ -80,11 +80,15 @@
 <button type="button" class="btn btn-outline-primary"><i class="ion ion-md-add"></i> {{ label }}</button>
 {% endmacro %}
 
-{% macro tagsselection(name, label='', options=[], tip='', autoCreate=false) %}
+{% macro tagsselection(name, label='', options=[], values=[], tip='', autoCreate=false) %}
 {% if label|length %}{{ label }}{% endif %}
 <select {% if name|length %}name="{{ name + '[]' }}"{% endif %} class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %}>
 	{% for opt in options %}
-	<option value="{{ opt.value }}" {% if opt.selected == true %}selected{% endif %}>{{ opt.label }}</option>
+	{% set selected = false %}
+	{% if values|length and opt.value in values %}
+		{% set selected = true %}
+	{% endif %}
+	<option value="{{ opt.value }}" {% if selected %}selected{% endif %}>{{ opt.label }}</option>
     {% endfor %}
 </select>
 {{ fieldtip(tip) }}

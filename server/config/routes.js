@@ -49,6 +49,72 @@ function collectFields(layouts){
     }
 }
 
+function getRelatedData(fields){
+    const relatedFields = _.filter(fields, fd => !!fd.related );
+    let relatedData = {};
+
+    let relatedPromises = relatedFields.map( fd => {
+        return interface["get" + capitalize(pluralize(fd.related))]()
+            .then( results => {
+                let nextData = {};
+                nextData[fd.related] = results;
+                return nextData;
+            });
+    });
+    return Promise.all(relatedPromises)
+        .then( results => {
+            _.each(results, result => {
+                _.merge(relatedData, result);
+            });
+        })
+        .then( () => {
+            _.each(relatedFields, fd => {
+                let relateds = relatedData[fd.related];
+                relatedData[fd.related] = _.map(relateds, related => {
+                    let converted = {};
+                    _.each(_.keys(fd.valueMap), key => {
+                        converted[key] = related[fd.valueMap[key]];
+                    });
+                    return converted;
+                });
+            });
+            return relatedData;
+        });
+}
+
+function mergeCollectionRelateds(fields, mutableData){
+    const collectionFields = _.filter(fields, function(fd){ return fd.type == "collection" });
+    let collectionPromise = [];
+    _.each(collectionFields, fd => {
+        let lodashMethod = "";
+        if (fd.valueType == "integer") {
+            lodashMethod = "toSafeInteger";
+        }
+        if (lodashMethod) {
+            let toPromises = _.map(mutableData[fd.name] || [], val => {
+                let converted =  _[lodashMethod](val);
+                if ( converted == 0 ) {
+                    let toCreate = {};
+                    toCreate[fd.valueOnCreate] = val;
+                    return interface["create" + capitalize(fd.related)](toCreate)
+                        .then( result => {
+                            if (typeof result == "object") return result.id;
+                            else if (Array.isArray(result)) return result[0].id;
+                        });
+                }
+                return Promise.resolve(converted);
+            });
+            collectionPromise.push(
+                Promise.all(toPromises)
+                    .then( collectRes => {
+                        mutableData[fd.name] = collectRes;
+                    })
+            );
+        }
+    });
+    return Promise.all(collectionPromise);
+}
+
 function notFound(res){ res.status(404).send("Not found."); }
 function badRequest(res){ res.status(400).send("Bad request."); }
 
@@ -102,76 +168,50 @@ module.exports = function(app, passport) {
     // =====================================
     // CRUD Pages ==========================
     // =====================================
-    app.get('/items/create', loginRequired, function(req, res){
+    app.get('/items/create', loginRequired, async function(req, res){
         const fields = collectFields(createLayout);
-        const collectionFields = _.filter(fields, function(fd){ return fd.type == "collection" });
-        let relatedData = {};
 
-        let relatedPromises = collectionFields.map( fd => {
-            return interface["get" + capitalize(pluralize(fd.related))]()
-                .then( results => {
-                    let nextData = {};
-                    nextData[fd.related] = results;
-                    return nextData;
-                });
-        });
-        Promise.all(relatedPromises)
-            .then( results => {
-                _.each(results, result => {
-                    _.merge(relatedData, result);
-                });
-            })
-            .then( () => {
-                _.each(collectionFields, fd => {
-                    let relateds = relatedData[fd.related];
-                    relatedData[fd.related] = _.map(relateds, related => {
-                        let converted = {};
-                        _.each(_.keys(fd.valueMap), key => {
-                            converted[key] = related[fd.valueMap[key]];
-                        });
-                        return converted;
-                    });
-                });
-
-                res.render('items/create', { 
-                    path: '/items/create', layouts: createLayout, data: relatedData
-                } );
-            });
-
+        res.render('items/create', { 
+            path: '/items/create', 
+            layouts: createLayout, 
+            data: { _relateds: await getRelatedData(fields) }
+        } );
     });
     app.post('/items/create', loginRequired, function(req, res){
         const fields = collectFields(createLayout);
+        const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
         let mutableData = _.cloneDeep(req.body);
         let shouldUploads = [];
         let fileHandler = new FileHandler("items");
-        fields.forEach(function(fd){
-            if (fd.type == "json") {
-                let targetVal = mutableData[fd.name];
-                if ( Array.isArray(targetVal) ) {
-                    // find the files fields
-                    let fileNames = _.map(
-                        _.filter(fd.fields, inf => { 
-                            return inf.type == "image-file" || inf.type == "file";
-                        }),
-                        o => o.name
-                    );
-                    // find file field in json and collect them
-                    _.each(fileNames, name => {
-                        _.each(mutableData[fd.name], tuple => {
-                            const val = tuple[name];
-                            if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
-                                fileHandler.add(tuple, name);
-                            }
-                        })
-                    });
-                } else if (typeof targetVal == "undefined" || targetVal == "") {
-                    // defaults
-                    mutableData[fd.name] = {};
-                }
+
+        _.each(transferFields, fd => {
+            let targetVal = mutableData[fd.name];
+            if ( Array.isArray(targetVal) ) {
+                // find the files fields
+                let fileNames = _.map(
+                    _.filter(fd.fields, inf => { 
+                        return inf.type == "image-file" || inf.type == "file";
+                    }),
+                    o => o.name
+                );
+                // find file field in json and collect them
+                _.each(fileNames, name => {
+                    _.each(mutableData[fd.name], tuple => {
+                        const val = tuple[name];
+                        if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
+                            fileHandler.add(tuple, name);
+                        }
+                    })
+                });
+            } else if (typeof targetVal == "undefined" || targetVal == "") {
+                // defaults
+                mutableData[fd.name] = {};
             }
         });
-        
-        fileHandler.exec()
+
+        // fields, mutableData
+        mergeCollectionRelateds(fields, mutableData)
+            .then( () => { return fileHandler.exec() })
             .then(function(){ return interface.createItem(mutableData) })
             .then(function(result){ res.redirect('/items/'); })
             .catch(function(err){ console.log(err) });
@@ -214,15 +254,16 @@ module.exports = function(app, passport) {
             .catch(next);
     });
     app.get('/items/:id/update', loginRequired, function(req, res, next){
-        var lookid = req.params.id,
+        const lookid = req.params.id,
             fields = collectFields(createLayout),
-            transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+            transferFields = _.filter(fields, function(fd){ return fd.type == "json" }),
             integerFields = _.filter(fields, function(fd){ return fd.type == "integer" });
 
         interface.getItem({ id: lookid })
-            .then(function(results){
-                if (!results.length) return notFound(res);
-                var mutableData = results[0];
+            .then(async function(results){
+                if (!results.length) return Promise.reject(notFound(res));
+                let relatedData = await getRelatedData(fields);
+                let mutableData = results[0];
                 _.each(transferFields, function(fd){
                     _.each(mutableData[fd.name] || [], function(data){
                         var imageFiles = _.filter(fd.fields, f => f.type == "image-file" );
@@ -238,6 +279,7 @@ module.exports = function(app, passport) {
                 _.each(integerFields, function(fd){
                     if (mutableData[fd.name] == 0) mutableData[fd.name] = '';
                 });
+                mutableData._relateds = relatedData;
                 res.render('items/_id/update', { path: '/items/' + lookid + '/update', 
                     layouts: createLayout,
                     data: mutableData
@@ -250,12 +292,13 @@ module.exports = function(app, passport) {
         const lookid = req.params.id;
         const fields = collectFields(createLayout);
         const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+        const collectionFields = _.filter(fields, function(fd){ return fd.type == "collection" });
         const fileHandler = new FileHandler("items");
         let mutableData = _.cloneDeep(req.body);
 
         interface.getItem({ id: lookid })
             .then(function(results){
-                if (!results.length) return badRequest(res);
+                if (!results.length) return Promise.reject(badRequest(res));
 
                 let old = results[0];
 
@@ -311,6 +354,10 @@ module.exports = function(app, passport) {
                         mutableData[fd.name] = handshakes;
                     }
                 });
+
+                return mergeCollectionRelateds(fields, mutableData);
+            })
+            .then(function(){
                 return fileHandler.exec();
             })
             .then(function(){

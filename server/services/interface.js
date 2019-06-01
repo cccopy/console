@@ -125,5 +125,12 @@ module.exports = {
 				})
 				.catch( err => reject(err) );
 		});
+	},
+	createKeyword: function(data){
+		return new Promise(function(resolve, reject){
+			axiosIns.post(methods.keyword, data)
+				.then(function(response){ resolve(response.data); })
+				.catch( err => reject(err) );
+		});
 	}
 }

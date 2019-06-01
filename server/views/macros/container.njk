@@ -41,7 +41,7 @@
 		{{ forms.imagefilefield(fieldname, value=data[field.name]) }}
 	{% endif %}
 {% elif field.type == 'collection' and field.layout == 'tags-selection' %}
-	{{ forms.tagsselection(fieldname, tip=field.tip, options=data[field.related], autoCreate=field.autoCreate) }}
+	{{ forms.tagsselection(fieldname, tip=field.tip, options=data._relateds[field.related], values=data[field.name], autoCreate=field.autoCreate) }}
 {% elif field.type == 'json' %}
 	{% if field.layout == 'list' %}
 		{{ editlist(fieldname, field.fields, data[field.name]) }}

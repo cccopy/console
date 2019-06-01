@@ -55,6 +55,8 @@
 						"label": "word",
 						"value": "id"
 					},
+					"valueOnCreate": "word",
+					"valueType": "integer",
 					"label": "關鍵字",
 					"required": true,
 					"layout": "tags-selection",
@@ -173,7 +175,6 @@
 					"name": "submitFactors",
 					"label": "用戶需提交素材",
 					"type": "json",
-					"related": "options",
 					"required": true,
 					"layout": "list",
 					"fields": [
