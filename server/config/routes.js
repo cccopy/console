@@ -9,6 +9,9 @@ var isDev = process.env.NODE_ENV === 'development';
 var _ = require('lodash');
 var FileHandler = require('../services/file-handler');
 var pluralize = require('pluralize');
+var glob = require("glob");
+
+var layoutNamespace = {};
 
 // views model
 var menus = require('../models/menus.config.json');
@@ -168,15 +171,33 @@ module.exports = function(app, passport) {
     // =====================================
     // CRUD Pages ==========================
     // =====================================
-    app.get('/items/create', loginRequired, async function(req, res){
-        const fields = collectFields(createLayout);
-
-        res.render('items/create', { 
-            path: '/items/create', 
-            layouts: createLayout, 
-            data: { _relateds: await getRelatedData(fields) }
-        } );
+    let filepaths = glob.sync('server/models/*/create.config.json');
+    _.each(filepaths, path => {
+        let modelPaths = path.split('server/models/');
+        let tailPathSplits = modelPaths[1].split('/');
+        let modelName = tailPathSplits[0];
+        let actionName = tailPathSplits[1].split(".")[0];
+        if (!layoutNamespace[modelName]) layoutNamespace[modelName] = {};
+        layoutNamespace[modelName][actionName] = require(path.replace("server/", "../"));
     });
+
+    _.each(layoutNamespace, (actions, modelName) => {
+        _.each(actions, (layouts, actionName) => {
+            let currentPath = [modelName, actionName].join('/');
+            console.log(currentPath);
+            app.get('/' + currentPath, loginRequired, (function(path, layout){
+                return async function(req, res){
+                    const fields = collectFields(layout);
+                    res.render(path, { 
+                        path: '/' + path, 
+                        layouts: layout, 
+                        data: { _relateds: await getRelatedData(fields) }
+                    } );
+                };
+            })(currentPath, layouts) )
+        })
+    });
+
     app.post('/items/create', loginRequired, function(req, res){
         const fields = collectFields(createLayout);
         const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
