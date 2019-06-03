@@ -1,0 +1,59 @@
+{
+	"fields": [
+		{
+			"name": "title",
+			"label": "選項集名稱",
+			"required": true,
+			"type": "string"
+		},
+		{
+			"name": "type",
+			"label": "選項集型態",
+			"type": "string",
+			"layout": "linked-selection",
+			"options": ["文字", "圖片", "聲音"],
+			"linkTo": "datasets"
+		},
+		{
+			"name": "datasets",
+			"label": "選項值集合",
+			"type": "json",
+			"fieldSets": [
+				{
+					"type": "string",
+					"label": "文字選項清單",
+					"layout": "tags-selection",
+					"autoCreate": true
+				},
+				[
+					{
+						"name": "label",
+						"type": "string",
+						"label": "標題說明",
+						"width": "45%"
+					},
+					{
+						"name": "value",
+						"type": "image-file",
+						"label": "圖片",
+						"width": "50%"
+					}
+				],
+				[
+					{
+						"name": "label",
+						"type": "string",
+						"label": "標題說明",
+						"width": "45%"
+					},
+					{
+						"name": "value",
+						"type": "audio-file",
+						"label": "聲音",
+						"width": "50%"
+					}
+				]
+			]
+		}
+	]
+}

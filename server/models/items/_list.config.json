@@ -1,4 +1,7 @@
 {
+	"filters": {
+		"additionType": "isEmpty"
+	},
 	"layout": "grid",
 	"fields": [
 		{
