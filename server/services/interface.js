@@ -79,14 +79,25 @@ module.exports = {
 			.catch( err => { reject(err); });
 		});
 	},
-	getItems: function(offset, limit){
+	getItems: function(query){
 		var params = {};
-		if (typeof offset !== "undefined") params._start = offset;
-		if (typeof limit !== "undefined") params._limit = limit;
+		if (typeof query.offset !== "undefined") params._start = offset;
+		if (typeof query.limit !== "undefined") params._limit = limit;
 		return new Promise(function(resolve, reject){
 			axiosIns.get(methods.items, { params: params })
 				.then(function(response){
-					resolve(response.data);
+					let results = response.data;
+					if ( !_.isEmpty(query._filters) ) {
+						// OR
+						let props = _.keys(query._filters);
+						results = _.filter(results, result => {
+							for(let p = 0, plen = props.length; p < plen; p++) {
+								let k = props[p];
+								if ( _[query._filters[k]](result[k]) ) return true;
+							}
+						});
+					}
+					resolve(results);
 				})
 				.catch( err => reject(err) );
 		});

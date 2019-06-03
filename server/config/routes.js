@@ -241,7 +241,9 @@ module.exports = function(app, passport) {
     app.get('/items/', loginRequired, function(req, res, next){
         var fields = collectFields(_listLayout);
         var transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
-        interface.getItems()
+        var query = {};
+        if(!_.isEmpty(_listLayout.filters)) query._filters = _listLayout.filters;
+        interface.getItems(query)
             .then(function(results){
                 // do decode here
                 var mutableData = results;
