@@ -80,7 +80,7 @@ module.exports = {
 		});
 	},
 	getItems: function(query){
-		var params = {};
+		var params = { _limit: -1 };
 		if (typeof query.offset !== "undefined") params._start = offset;
 		if (typeof query.limit !== "undefined") params._limit = limit;
 		return new Promise(function(resolve, reject){
@@ -126,7 +126,7 @@ module.exports = {
 		});	
 	},
 	getKeywords: function(offset, limit){
-		var params = {};
+		var params = { _limit: -1 };
 		if (typeof offset !== "undefined") params._start = offset;
 		if (typeof limit !== "undefined") params._limit = limit;
 		return new Promise(function(resolve, reject){
