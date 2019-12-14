@@ -205,6 +205,6 @@ $(function(){
 
 $(function(){
 	var views = $(".gridview");
-	if (views.length) views.dataTable();
+	if (views.length) views.dataTable( {pageLength: 25} );
 });
 

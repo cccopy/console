@@ -15,7 +15,6 @@
 					"name": "description",
 					"label": "說明文字",
 					"required": true,
-					"tip": "影片特點",
 					"type": "text"
 				},
 				{
@@ -23,6 +22,11 @@
 					"type": "integer",
 					"required": true,
 					"label": "價格"
+				},
+				{
+					"name": "highlight",
+					"label": "影片亮點",
+					"type": "text"
 				}, 
 				{
 					"name": "factors",
@@ -35,6 +39,11 @@
 					"label": "影片長度",
 					"required": true
 				},
+				{
+					"name": "strategy",
+					"label": "影片策略",
+					"type": "text"
+				}, 
 				{
 					"name": "context",
 					"label": "適用情境",
@@ -73,6 +82,12 @@
 					"type": "string",
 					"label": "交期",
 					"required": true
+				},
+				{
+					"name": "submitFactorDescription",
+					"label": "提交素材說明",
+					"tip": "用戶需提交素材",
+					"type": "text"
 				}
 			]
 		},
