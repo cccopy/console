@@ -48,6 +48,12 @@ module.exports = function (app, passport) {
 		}
 	}));
 	
+	// common nunjucks properties
+	app.use(function(req, res, next){
+		res.locals.currentpath = req.path;
+		next();
+	});
+
 	// for error handler
 	app.use(function(err, req, res, next){
     	if (res.headersSent) {

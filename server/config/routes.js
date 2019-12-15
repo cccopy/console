@@ -189,12 +189,10 @@ module.exports = function(app, passport) {
     _.each(layoutNamespace, (actions, modelName) => {
         _.each(actions, (layouts, actionName) => {
             let currentPath = [modelName, actionName].join('/');
-            console.log(currentPath);
             app.get('/' + currentPath, loginRequired, (function(path, layout){
                 return async function(req, res){
                     const fields = collectFields(layout);
                     res.render(path, { 
-                        path: '/' + path, 
                         layouts: layout, 
                         data: { _relateds: await getRelatedData(fields) }
                     } );
@@ -277,7 +275,10 @@ module.exports = function(app, passport) {
                         result[fd.name] = mutableList;
                     });
                 });
-                res.render('items/_list', { path: '/items/', layouts: _listLayout, data: mutableData });
+                res.render('items/_list', {
+                    layouts: _listLayout,
+                    data: mutableData
+                });
             })
             .catch(next);
     });
@@ -308,7 +309,7 @@ module.exports = function(app, passport) {
                     if (mutableData[fd.name] == 0) mutableData[fd.name] = '';
                 });
                 mutableData._relateds = relatedData;
-                res.render('items/_id/update', { path: '/items/' + lookid + '/update', 
+                res.render('items/_id/update', { 
                     layouts: createLayout,
                     data: mutableData
                 } );

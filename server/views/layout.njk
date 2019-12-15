@@ -25,7 +25,7 @@
 			<!-- Links -->
 			<ul class="sidenav-inner py-1">
 				{% for menu in menus %}
-				{% set inbase = path|isNamebase(menu.urlbase) %}
+				{% set inbase = currentpath|isNamebase(menu.urlbase) %}
 				<li class="sidenav-item {% if inbase %}open active{% endif %}">
 					<a href="javascript:void(0)" class="sidenav-link sidenav-toggle"><i class="sidenav-icon {{ menu.iconClass }}"></i>
 						<div>{{ menu.title }}</div>
@@ -34,7 +34,7 @@
 					<ul class="sidenav-menu">
 						{% for item in menu.items %}
 						{% set linkurl = [menu.urlbase, item.url] | join %}
-						<li class="sidenav-item {% if inbase and path|isItemActive(linkurl) %}active{% endif %}">
+						<li class="sidenav-item {% if inbase and currentpath|isItemActive(linkurl) %}active{% endif %}">
 							<a href="{{ linkurl }}" class="sidenav-link">
 								<div>{{ item.title }}</div>
 							</a>
