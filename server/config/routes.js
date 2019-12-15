@@ -164,7 +164,12 @@ module.exports = function(app, passport) {
 
 
     app.get('/', loginRequired, function(req, res) {
-        res.render('index');
+        let firstMenu = _.get(menus, "[0]");
+        if (firstMenu) {
+            let url = _.get(firstMenu, "url") || 
+                (_.get(firstMenu, "urlbase") + _.get(firstMenu, "items[0].url"));
+            res.redirect(url);
+        } else res.render('index');
     });
 
 
