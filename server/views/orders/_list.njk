@@ -1,0 +1,26 @@
+
+{% extends "layout.njk" %}
+
+{% import "macros/container.njk" as container %}
+
+{% block headtitle %}訂單管理{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/assets/css/containers.css">
+<link rel="stylesheet" href="/assets/vendor/libs/datatables/datatables.css">
+{% endblock %}
+
+{% block bodyjs %}
+{{ super() }}
+<script src="/assets/vendor/libs/datatables/datatables.js"></script>
+<script src="/assets/js/containers.js"></script>
+{% endblock %}	
+
+{% block innerContent %}
+<h4 class="font-weight-bold py-3 mb-4">訂單管理</h4>
+{% if layouts.layout == 'grid' %}
+{{ container.gridview(layouts.fields, data) }}
+{% endif %}
+{% endblock %}
+
+

@@ -1,0 +1,22 @@
+{
+	"layout": "grid",
+	"fields": [
+		{
+			"name": "serialNumber",
+			"label": "訂單編號",
+			"link": ":id/update"
+		},
+		{
+			"name": "status",
+			"label": "狀態"
+		},
+		{
+			"name": "advancePayment",
+			"label": "應付訂金"	
+		},
+		{
+			"name": "finalPayment",
+			"label": "尾款"
+		}
+	]
+}
