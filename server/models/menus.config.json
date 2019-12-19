@@ -13,5 +13,10 @@
 				"url": "/create"
 			}
 		]
+	},
+	{
+		"title": "訂單管理",
+		"iconClass": "ion ion-md-business",
+		"url": "/orders/"
 	}
 ]
