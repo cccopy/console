@@ -7,6 +7,8 @@ const strkey = require('../config/constants.json').sessionKey;
 
 var s3re = new RegExp("^.+amazonaws\\.com/(.+)$");
 
+function lessTenAddZero(v) { return v < 10? ("0" + v) : v; };
+
 function isDataURL(s) {
     return s && !!s.match(isDataURL.regex);
 }
@@ -72,5 +74,13 @@ exports.convertS3Url = function(s3url){
 		return "https://" + matches[1];
 	}
 	return s3url;
+};
+
+exports.dateToNormalFormat = function(dte, split){
+	split = split || "/";
+	var year = dte.getUTCFullYear(),
+		month = dte.getUTCMonth() + 1,
+		day = dte.getUTCDate();
+	return [year.toString(), lessTenAddZero(month), lessTenAddZero(day)].join(split);
 };
 

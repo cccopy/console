@@ -9,7 +9,7 @@
 		{{ forms.imagelistview(celldata) }}
 	{% endif %}
 {% else %}
-{{ celldata }}
+{{ celldata | useFormatFunction(field.formatFn) }}
 {% endif %}
 {% endmacro %}
 

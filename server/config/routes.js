@@ -154,6 +154,12 @@ module.exports = function(app, passport) {
         return result;
     });
 
+    nunEnv.addFilter("useFormatFunction", function(val, fnName){
+        if (fnName) {
+            if ( fnName == "dateFormat" ) return utils.dateToNormalFormat(new Date(val));
+        }
+        return val;
+    });
     nunEnv.addGlobal("menus", menus);
     nunEnv.addGlobal("widgets", widgets);
 
