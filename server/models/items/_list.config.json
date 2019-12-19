@@ -1,7 +1,4 @@
 {
-	"filters": {
-		"additionType": "isEmpty"
-	},
 	"layout": "grid",
 	"fields": [
 		{
@@ -19,7 +16,7 @@
 			"label": "影片或圖片",
 			"type": "json",
 			"layout": "imagelist",
-			"width": "55%",
+			"width": "40%",
 			"fields": [
 				{
 					"name": "url",
