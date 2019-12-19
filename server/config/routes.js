@@ -176,7 +176,7 @@ module.exports = function(app, passport) {
     // =====================================
     // CRUD Pages ==========================
     // =====================================
-    let filepaths = glob.sync('server/models/*/create.config.json');
+    let filepaths = glob.sync('server/models/*/*.config.json');
     _.each(filepaths, path => {
         let modelPaths = path.split('server/models/');
         let tailPathSplits = modelPaths[1].split('/');
@@ -188,16 +188,62 @@ module.exports = function(app, passport) {
 
     _.each(layoutNamespace, (actions, modelName) => {
         _.each(actions, (layouts, actionName) => {
-            let currentPath = [modelName, actionName].join('/');
-            app.get('/' + currentPath, loginRequired, (function(path, layout){
-                return async function(req, res){
-                    const fields = collectFields(layout);
-                    res.render(path, { 
-                        layouts: layout, 
-                        data: { _relateds: await getRelatedData(fields) }
-                    } );
-                };
-            })(currentPath, layouts) )
+            let currentPath = [modelName, actionName].join('/'),
+                renderPath = currentPath;
+            if ( actionName == "_list" ) currentPath = [modelName, ""].join('/');
+            app.get('/' + currentPath, loginRequired, (function(path, layout, model, action){
+                if ( action == "_list" ) {
+                    return async function(req, res, next) {
+                        const fields = collectFields(layout);
+                        let transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+                        let query = {};
+                        if(!_.isEmpty(layout.filters)) query._filters = layout.filters;
+                        interface["get" + capitalize(model)](query)
+                            .then(function(results){
+                                // do decode here
+                                let mutableData = results;
+                                _.each(mutableData, function(result){
+                                    _.each(transferFields, function(fd){
+                                        let datalist = result[fd.name] || [];
+                                        let imageFiles = _.filter(fd.fields, f => f.type == "image-file" );
+                                        let strings = _.filter(fd.fields, f => f.type == "video-url" );
+                                        let mutableList = _.map(datalist, function(data){
+                                            let newData = {};
+                                            _.each(imageFiles, function(f){
+                                                if (data[f.name]) {
+                                                    newData.src = newData.link = data[f.name].url;
+                                                    newData.type = 'image';
+                                                }
+                                            });
+                                            _.each(strings, function(f){
+                                                if (data[f.name]) {
+                                                    newData.src = getYoutubeThumbnail(data[f.name]);
+                                                    newData.link = data[f.name];
+                                                    newData.type = 'video';
+                                                }
+                                            });
+                                            return _.isEmpty(newData) ? data : newData;
+                                        });
+                                        result[fd.name] = mutableList;
+                                    });
+                                });
+                                res.render(path, {
+                                    layouts: layout,
+                                    data: mutableData
+                                });
+                            })
+                            .catch(next);
+                    };
+                } else {
+                    return async function(req, res){
+                        const fields = collectFields(layout);
+                        res.render(path, { 
+                            layouts: layout, 
+                            data: { _relateds: await getRelatedData(fields) }
+                        } );
+                    };
+                }
+            })(renderPath, layouts, modelName, actionName) );
         })
     });
 
@@ -241,47 +287,6 @@ module.exports = function(app, passport) {
             .catch(function(err){ console.log(err) });
     });
 
-    app.get('/items/', loginRequired, function(req, res, next){
-        var fields = collectFields(_listLayout);
-        var transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
-        var query = {};
-        if(!_.isEmpty(_listLayout.filters)) query._filters = _listLayout.filters;
-        interface.getItems(query)
-            .then(function(results){
-                // do decode here
-                var mutableData = results;
-                _.each(mutableData, function(result){
-                    _.each(transferFields, function(fd){
-                        var datalist = result[fd.name] || [];
-                        var imageFiles = _.filter(fd.fields, f => f.type == "image-file" );
-                        var strings = _.filter(fd.fields, f => f.type == "video-url" );
-                        var mutableList = _.map(datalist, function(data){
-                            var newData = {};
-                            _.each(imageFiles, function(f){
-                                if (data[f.name]) {
-                                    newData.src = newData.link = data[f.name].url;
-                                    newData.type = 'image';
-                                }
-                            });
-                            _.each(strings, function(f){
-                                if (data[f.name]) {
-                                    newData.src = getYoutubeThumbnail(data[f.name]);
-                                    newData.link = data[f.name];
-                                    newData.type = 'video';
-                                }
-                            });
-                            return _.isEmpty(newData) ? data : newData;
-                        });
-                        result[fd.name] = mutableList;
-                    });
-                });
-                res.render('items/_list', {
-                    layouts: _listLayout,
-                    data: mutableData
-                });
-            })
-            .catch(next);
-    });
     app.get('/items/:id/update', loginRequired, function(req, res, next){
         const lookid = req.params.id,
             fields = collectFields(createLayout),
