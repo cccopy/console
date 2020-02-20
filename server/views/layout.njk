@@ -4,71 +4,119 @@
 {% block content %}
 <!-- Layout wrapper -->
 <div class="layout-wrapper layout-2">
-	<div class="layout-inner">
+    <div class="layout-inner">
 
-		<!-- Layout sidenav -->
-		<div id="layout-sidenav" class="layout-sidenav sidenav sidenav-vertical bg-dark">
+        <!-- Layout sidenav -->
+        <div id="layout-sidenav" class="layout-sidenav sidenav sidenav-vertical bg-dark">
 
-			<!-- Brand demo (see assets/css/demo/demo.css) -->
-			<div class="app-brand demo">
-				<span class="app-brand-logo demo">
-	            	<img src="/assets/img/c-icon.png">
-				</span>
-				<a href="/" class="app-brand-text demo sidenav-text font-weight-normal ml-2">CCcopy</a>
-				<a href="javascript:void(0)" class="layout-sidenav-toggle sidenav-link text-large ml-auto">
-					<i class="ion ion-md-menu align-middle"></i>
-				</a>
-			</div>
+            <!-- Brand demo (see assets/css/demo/demo.css) -->
+            <div class="app-brand demo">
+                <span class="app-brand-logo demo">
+                    <img src="/assets/img/c-icon.png">
+                </span>
+                <a href="/" class="app-brand-text demo sidenav-text font-weight-normal ml-2">CCcopy</a>
+                <a href="javascript:void(0)" class="layout-sidenav-toggle sidenav-link text-large ml-auto">
+                    <i class="ion ion-md-menu align-middle"></i>
+                </a>
+            </div>
 
-			<div class="sidenav-divider mt-0"></div>
+            <div class="sidenav-divider mt-0"></div>
 
-			<!-- Links -->
-			<ul class="sidenav-inner py-1">
-				{% for menu in menus %}
-					{% if menu.url %}
-					{% set inbase = currentpath|isNamebase(menu.url) %}
-					<li class="sidenav-item {% if inbase %}open active{% endif %}">
-						<a href="{{ menu.url }}" class="sidenav-link">
-							<i class="sidenav-icon {{ menu.iconClass }}"></i><div>{{ menu.title }}</div>
-						</a>
-					</li>
-					{% else %}
-					{% set inbase = currentpath|isNamebase(menu.urlbase) %}
-					<li class="sidenav-item {% if inbase %}open active{% endif %}">
-						<a href="javascript:void(0)" class="sidenav-link sidenav-toggle"><i class="sidenav-icon {{ menu.iconClass }}"></i>
-							<div>{{ menu.title }}</div>
-						</a>
-						{% if menu.items|length %}
-						<ul class="sidenav-menu">
-							{% for item in menu.items %}
-							{% set linkurl = [menu.urlbase, item.url] | join %}
-							<li class="sidenav-item {% if inbase and currentpath|isItemActive(linkurl) %}active{% endif %}">
-								<a href="{{ linkurl }}" class="sidenav-link">
-									<div>{{ item.title }}</div>
-								</a>
-							</li>
-							{% endfor %}
-						</ul>
-						{% endif %}
-					</li>
-					{% endif %}
-				{% endfor %}
-			</ul>
-		</div>
+            <!-- Links -->
+            <ul class="sidenav-inner py-1">
+                {% for menu in menus %}
+                    {% if menu.url %}
+                    {% set inbase = currentpath|isNamebase(menu.url) %}
+                    <li class="sidenav-item {% if inbase %}open active{% endif %}">
+                        <a href="{{ menu.url }}" class="sidenav-link">
+                            <i class="sidenav-icon {{ menu.iconClass }}"></i><div>{{ menu.title }}</div>
+                        </a>
+                    </li>
+                    {% else %}
+                    {% set inbase = currentpath|isNamebase(menu.urlbase) %}
+                    <li class="sidenav-item {% if inbase %}open active{% endif %}">
+                        <a href="javascript:void(0)" class="sidenav-link sidenav-toggle"><i class="sidenav-icon {{ menu.iconClass }}"></i>
+                            <div>{{ menu.title }}</div>
+                        </a>
+                        {% if menu.items|length %}
+                        <ul class="sidenav-menu">
+                            {% for item in menu.items %}
+                            {% set linkurl = [menu.urlbase, item.url] | join %}
+                            <li class="sidenav-item {% if inbase and currentpath|isItemActive(linkurl) %}active{% endif %}">
+                                <a href="{{ linkurl }}" class="sidenav-link">
+                                    <div>{{ item.title }}</div>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
 
-		<!-- Layout container -->
-		<div class="layout-container">
-			<!-- Layout content -->
-			<div class="layout-content">
+        <!-- Layout container -->
+        <div class="layout-container">
+            <!-- Layout navbar -->
+            <nav class="layout-navbar navbar navbar-expand-lg align-items-lg-center bg-white container-p-x" id="layout-navbar">
 
-				<!-- Content -->
-				<div class="container-fluid flex-grow-1 container-p-y">
-				{% block innerContent %}
-				{% endblock %}
-				</div>
-			</div>
-		</div>
-	</div>
+                <!-- Brand demo (see assets/css/demo/demo.css) -->
+                <a href="/" class="navbar-brand app-brand demo d-lg-none py-0 mr-4">
+                    <span class="app-brand-logo demo">
+                        <img src="/assets/img/c-icon.png">
+                    </span>
+                    <span class="app-brand-text demo font-weight-normal ml-2">CCcopy</span>
+                </a>
+
+                <!-- Sidenav toggle (see assets/css/demo/demo.css) -->
+                <div class="layout-sidenav-toggle navbar-nav d-lg-none align-items-lg-center mr-auto">
+                    <a class="nav-item nav-link px-0 mr-lg-4" href="javascript:void(0)">
+                        <i class="ion ion-md-menu text-large align-middle"></i>
+                    </a>
+                </div>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#layout-navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse collapse" id="layout-navbar-collapse">
+                    <!-- Divider -->
+                    <hr class="d-lg-none w-100 my-2">
+
+                    <div class="navbar-nav align-items-lg-center ml-auto">
+                  
+                        <!-- Divider -->
+                        <div class="nav-item d-none d-lg-block text-big font-weight-light line-height-1 opacity-25 mr-3 ml-1">|</div>
+
+                        <div class="demo-navbar-user nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                <span class="d-inline-flex flex-lg-row-reverse align-items-center align-middle line-height-30">
+                                    <span class="px-1 mr-lg-2 ml-2 ml-lg-0">{{ username }}</span>
+                                </span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <!-- <a href="javascript:void(0)" class="dropdown-item"><i class="ion ion-ios-person text-lightest"></i> &nbsp; My profile</a>
+                                <a href="javascript:void(0)" class="dropdown-item"><i class="ion ion-ios-mail text-lightest"></i> &nbsp; Messages</a>
+                                <a href="javascript:void(0)" class="dropdown-item"><i class="ion ion-md-settings text-lightest"></i> &nbsp; Account settings</a>
+                                <div class="dropdown-divider"></div> -->
+                                <a href="javascript:void(0)" class="dropdown-item"><i class="ion ion-ios-log-out text-danger"></i> &nbsp; Log Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- Layout content -->
+            <div class="layout-content">
+
+                <!-- Content -->
+                <div class="container-fluid flex-grow-1 container-p-y">
+                {% block innerContent %}
+                {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -77,4 +125,4 @@
 {% block bodyjs %}
 <!-- Demo -->
 <script src="/assets/js/demo.js"></script>
-{% endblock %}	
+{% endblock %}  

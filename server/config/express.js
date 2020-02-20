@@ -51,6 +51,8 @@ module.exports = function (app, passport) {
 	// common nunjucks properties
 	app.use(function(req, res, next){
 		res.locals.currentpath = req.path;
+		res.locals.login = req.isAuthenticated();
+		res.locals.username = res.locals.login ? req.user.username : "";
 		next();
 	});
 
