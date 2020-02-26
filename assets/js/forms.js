@@ -18,4 +18,10 @@ $(function() {
 				$(this).trigger("change");
 			});
 	});
+
+	$("button[container-save]").click(function(){
+		$self = $(this);
+		$self.attr("status", "loading").prop("disabled", true);
+		$self.closest("form").submit();
+	});
 });

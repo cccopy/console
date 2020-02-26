@@ -24,12 +24,6 @@ $(function(){
 		return final;
 	}
 
-	$("button[container-save]").click(function(){
-		$self = $(this);
-		$self.attr("status", "loading").prop("disabled", true);
-		$self.closest("form").submit();
-	});
-
 	$("form[container-form]").submit(function(){
 		$self = $(this);
 		$self.find("[name][valuefor]").each(function(idx, el){

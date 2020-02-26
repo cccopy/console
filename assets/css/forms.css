@@ -10,3 +10,8 @@ label[image-field]{
 label[image-field] input[type=file]{
 	display: none;
 }
+
+button[status="normal"] span:not([status-normal]),
+button[status="loading"] span:not([status-loading]){
+    display: none;
+}
