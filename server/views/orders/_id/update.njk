@@ -1,0 +1,172 @@
+
+{% extends "layout.njk" %}
+
+{% import "macros/container.njk" as container %}
+
+{% block headtitle %}訂單管理 變更{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/assets/vendor/libs/select2/select2.css">
+<!-- <link rel="stylesheet" href="/assets/vendor/libs/dragula/dragula.min.css"> -->
+<link rel="stylesheet" href="/assets/css/containers.css">
+<link rel="stylesheet" href="/assets/css/forms.css">
+<!-- <link rel="stylesheet" href="/assets/css/create.css"> -->
+{% endblock %}
+
+{% block bodyjs %}
+{{ super() }}
+<script src="/assets/vendor/libs/select2/select2.js"></script>
+<!-- <script src="/assets/vendor/libs/dragula/dragula.min.js"></script> -->
+<script src="/assets/js/containers.js"></script>
+<script src="/assets/js/forms.js"></script>
+<!-- <script src="/assets/js/create.js"></script> -->
+{% endblock %}  
+
+{% block innerContent %}
+<h4 class="font-weight-bold py-3 mb-4">
+    訂單變更
+    <span class="text-muted">#{{ data.serialNumber }}</span>
+</h4>
+<form method="POST" container-form>
+    
+    <div class="card">
+        <!-- Status -->
+        <div class="card-body">
+            <strong class="mr-2">狀態:</strong>
+            <span class="text-big"><span class="badge badge-success">{{ data.status }}</span></span>
+            <span class="text-muted small ml-1">{{ data.updated_at | useFormatFunction('dateFormat') }}</span>
+        </div>
+        <hr class="m-0">
+        <!-- / Status -->
+        <!-- Info -->
+        <div class="card-body pb-1">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">成立日期</div>
+                    {{ data.created_at | useFormatFunction('dateFormat') }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">項目數</div>
+                    {{ data.itemCount }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">訂金</div>
+                    {{ data.advancePayment | locale }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">總金額</div>
+                    {{ data.totalAmount | locale }}
+                </div>
+            </div>
+        </div>
+        <hr class="m-0">
+        <!-- / Info -->
+
+        <!-- Billing -->
+        <div class="card-body">
+            <h6 class="small font-weight-semibold">
+              訂購者資訊
+            </h6>
+            <div class="row">            
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">姓名</div>
+                    {{ data.ownClient.name }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">職稱</div>
+                    {{ data.ownClient.jobTitle }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">電話</div>
+                    {{ data.ownClient.combinePhone }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">Email</div>
+                    {{ data.ownClient.email }}
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">公司</div>
+                    {{ data.ownClient.company }}
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">產業</div>
+                    {{ data.ownClient.industryCategory }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="text-muted small">地址</div>
+                    {{ data.ownClient.city }}{{ data.ownClient.county }}{{ data.ownClient.address }}
+                </div>
+
+            </div>
+        </div>
+        <hr class="m-0">
+        <!-- / Billing -->
+
+
+        <!-- Items -->
+        <div class="card-body">
+            <h6 class="small font-weight-semibold">
+              訂購項目
+            </h6>
+
+            <div class="table-responsive">
+                <table class="table table-bordered m-0" style="min-width:550px;">
+                    <tbody>
+                        {% for detail in data.details %}
+                        <tr>
+                            {% if detail.parentDetail > 0 %}
+                                <td class="p-3 pl-5">
+                            {% else %}
+                                <td class="p-3">
+                            {% endif %}
+                                <div class="media align-items-center">
+                                    <!-- <img src="assets/img/uikit/nike-1.jpg" class="d-block ui-w-40 ui-bordered mr-4" alt> -->
+                                    <div class="media-body">
+                                        <a class="d-block text-body">{{ detail.itemInfo.title }} </a>
+                                        <small>
+
+                                            {% if detail.parentDetail > 0 %}
+                                            <span class="text-muted">規格: </span> {{ detail.itemInfo.type }}
+                                            {% endif %}
+
+                                            {% if detail.itemInfo.advancePayment > 0 %}
+                                            <span class="text-muted">訂金: </span> {{ detail.itemInfo.advancePayment }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <!-- Set column width -->
+                            <td class="align-middle text-center p-3" style="width: 160px;">
+                                <select name="{{ detail.id }}-status" class="form-control">
+                                    {% for stateOption in detail.statusSelection %}
+                                    <option value="{{ stateOption.value }}" {% if stateOption.selected %}selected{% endif %}>{{ stateOption.value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <!-- Set column width -->
+                            <td class="text-right font-weight-semibold align-middle p-3" style="width: 110px;">
+                              {{ detail.itemInfo.price | locale }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- / Items -->
+    </div>
+
+    <div class="text-right mt-3">
+        <button type="button" class="btn btn-primary" container-save status="normal">
+            <span status-normal>儲存</span>
+            <span status-loading class="spinner-border" role="status" aria-hidden="true"></span>
+            <span status-loading>處理中...</span>
+        </button>
+        <input type="hidden" name="_M" value="PUT">
+    </div>
+</form>
+{% endblock %}

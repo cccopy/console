@@ -17,8 +17,20 @@ var layoutNamespace = {};
 var menus = require('../models/menus.config.json');
 var widgets = require('../models/widgets.config.json');
 
-var createLayout = require('../models/items/create.config.json');
-var _listLayout = require('../models/items/_list.config.json');
+var items_createLayout = require('../models/items/create.config.json');
+
+const detailStatusOptions = [
+    "等待審核素材",
+    "素材審核中",
+    "素材審核失敗",
+    "拍攝剪輯中",
+    "A copy交付",
+    "A copy修改",
+    "B copy交付",
+    "B copy修改",
+    "C copy交付",
+    "成品已確認"
+];
 
 // route middleware to make sure a user is logged in
 function loginRequired(req, res, next) {
@@ -160,6 +172,10 @@ module.exports = function(app, passport) {
         }
         return val;
     });
+
+    nunEnv.addFilter("locale", function(num){
+        return Number(num).toLocaleString();
+    });
     nunEnv.addGlobal("menus", menus);
     nunEnv.addGlobal("widgets", widgets);
 
@@ -254,7 +270,7 @@ module.exports = function(app, passport) {
     });
 
     app.post('/items/create', loginRequired, function(req, res){
-        const fields = collectFields(createLayout);
+        const fields = collectFields(items_createLayout);
         const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
         let mutableData = _.cloneDeep(req.body);
         let shouldUploads = [];
@@ -295,7 +311,7 @@ module.exports = function(app, passport) {
 
     app.get('/items/:id/update', loginRequired, function(req, res, next){
         const lookid = req.params.id,
-            fields = collectFields(createLayout),
+            fields = collectFields(items_createLayout),
             transferFields = _.filter(fields, function(fd){ return fd.type == "json" }),
             integerFields = _.filter(fields, function(fd){ return fd.type == "integer" });
 
@@ -321,16 +337,67 @@ module.exports = function(app, passport) {
                 });
                 mutableData._relateds = relatedData;
                 res.render('items/_id/update', { 
-                    layouts: createLayout,
+                    layouts: items_createLayout,
                     data: mutableData
                 } );
             })
             .catch(next);
     });
 
+    app.get('/orders/:id/update', loginRequired, function(req, res, next){
+        const lookid = req.params.id;
+
+        interface.getOrderWithDetails({ id: lookid})
+            .then(function(results){
+                if ( results && results.length ){
+                    let mutableData = results[0];
+
+                    mutableData.itemCount = mutableData.details.length;
+                    mutableData.totalAmount = mutableData.advancePayment + mutableData.finalPayment;
+
+                    let phone = mutableData.ownClient.phone,
+                        cellphone = mutableData.ownClient.cellphone;
+
+                    mutableData.ownClient.combinePhone = ( phone && cellphone ) ? [phone, cellphone].join(" / ") : (phone || cellphone);
+
+                    mutableData.details.sort( (a, b) => { 
+                        if ( a.parentDetail && b.parentDetail ) {
+                            if ( a.parentDetail < b.parentDetail ) return -1;
+                            else if ( a.parentDetail == b.parentDetail ) return (a.id < b.id) ? -1 : 1;
+                            else return 1;
+                        } else if ( !a.parentDetail && b.parentDetail ) {
+                            if ( a.id <= b.parentDetail ) return -1;
+                            else return 1;
+                        } else if ( a.parentDetail && !b.parentDetail ) {
+                            if ( a.parentDetail <= b.id ) return -1;
+                            else return 1;
+                        } else {
+                            if ( a.id < b.id ) return -1;
+                            else return 1;
+                        }
+                    } );
+
+                    mutableData.details.forEach((detail) => {
+                        detail.statusSelection = detailStatusOptions.map((op) => {
+                            return {
+                                value: op,
+                                selected: detail.status == op
+                            };
+                        });
+                    });
+
+                    res.render('orders/_id/update', { 
+                        // layouts: items_createLayout,
+                        data: mutableData
+                    } );
+                } else notFound(res);
+            })
+            .catch(next);
+    });
+
     app.put('/items/:id/update', loginRequired, function(req, res, next){
         const lookid = req.params.id;
-        const fields = collectFields(createLayout);
+        const fields = collectFields(items_createLayout);
         const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
         const collectionFields = _.filter(fields, function(fd){ return fd.type == "collection" });
         const fileHandler = new FileHandler("items");

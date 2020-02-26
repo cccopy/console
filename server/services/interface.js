@@ -114,6 +114,15 @@ module.exports = {
 				.catch( err => reject(err) );
 		});
 	},
+	getOrderWithDetails: function(condition){
+		var params = {};
+		if (typeof condition.id !== "undefined") params.id = condition.id;
+		return new Promise(function(resolve, reject){
+			axiosIns.get(methods.orders, { params: params })
+				.then(function(response){ resolve(response.data); })
+				.catch( err => reject(err) );
+		});
+	},
 	getItem: function(condition){
 		var params = {};
 		if (typeof condition.id !== "undefined") params.id = condition.id;

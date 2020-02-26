@@ -6,5 +6,6 @@
 		"remove": "upload/files"
 	},
 	"keyword": "keywords",
-	"orders": "orders"
+	"orders": "orders",
+    "orderdetails": "orderdetails"
 }
