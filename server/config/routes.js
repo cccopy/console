@@ -476,6 +476,40 @@ module.exports = function(app, passport) {
             .catch(next);
     });
 
+    app.put('/orders/:id/update', loginRequired, function(req, res, next){
+        const lookid = req.params.id;
+
+        const originData = _.cloneDeep(req.body);
+
+        let updateDetailList = [];
+
+        _.each(_.keys(originData), key => {
+            let keySplits = key.split("-status");
+            if (keySplits.length > 1) {
+                let detailId = parseInt(keySplits[0]);
+                updateDetailList.push({
+                    id: detailId,
+                    status: originData[key]
+                });
+            }
+        });
+
+        let promises = [];
+
+        if ( updateDetailList.length == _.filter(updateDetailList, d => d.status == "成品已確認").length ) {
+            // change main order to 已完成
+            promises.push(interface.updateOrder(lookid, { status: "已完成" }));
+        }
+
+        promises.push(interface.updateOrderDetails(updateDetailList));
+
+        Promise.all(promises)
+            .then(function(){
+                res.redirect('/orders/' +  lookid + '/update');
+            })
+            .catch(next);
+    });
+
 
     // =====================================
     // Authentication ======================

@@ -123,6 +123,18 @@ module.exports = {
 				.catch( err => reject(err) );
 		});
 	},
+	updateOrder: function(id, data){
+		return new Promise(function(resolve, reject){
+			axiosIns.put(methods.orders + "/" + id, data)
+				.then(function(response){ resolve(response.data); })
+				.catch( err => reject(err) );
+		});	
+	},
+	updateOrderDetails: function(detailList){
+		return Promise.all(_.map(detailList, dl => {
+			return axiosIns.put(methods.orderdetails + "/" + dl.id, { status: dl.status });
+		}));
+	},
 	getItem: function(condition){
 		var params = {};
 		if (typeof condition.id !== "undefined") params.id = condition.id;
