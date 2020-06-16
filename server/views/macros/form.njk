@@ -93,3 +93,20 @@
 </select>
 {{ fieldtip(tip) }}
 {% endmacro %}
+
+{% macro selection(name, label='', options=[], value='', tip='', emptylabel='Choose...') %}
+{% if label|length %}{{ label }}{% endif %}
+<select {% if name|length %}name="{{ name }}"{% endif %} class="form-control">
+	<option value="">{{ emptylabel }}</option>
+	{% for opt in options %}
+	{% set selected = false %}
+	{% if value|length and opt.value == value %}
+		{% set selected = true %}
+	{% endif %}
+	<option value="{{ opt.value }}" {% if selected %}selected{% endif %}>{{ opt.label }}</option>
+    {% endfor %}
+</select>
+{{ fieldtip(tip) }}
+{% endmacro %}
+
+

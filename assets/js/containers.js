@@ -200,6 +200,90 @@ $(function(){
 			}
 		});
 	});
+
+	$('[fieldsortlist-inputs]').each(function(midx, mel){
+		var $self = $(this),
+			addTarget = $self.siblings(".row"),
+			tplMainContent = $self.siblings("template[type='main-wrap']").get(0).content,
+			addButton = $self.children("button");
+
+		mel._namePrefix = $self.attr("fieldsortlist-prefix");
+		mel._groups = [];
+
+		var drake = dragula([addTarget.get(0)], {
+			moves: function(el, container, handle) {
+				return handle.classList.contains('sort-item-move');
+			},
+			direction: 'mixed'
+		});
+
+		drake.on("drop", function(){ 
+			// force rearrange group
+			mel._groups = [];
+			addTarget.children().each(function(){
+				mel._groups.push(this);
+			});
+			rearrangeIndex(mel);
+		});
+
+		// init remove event
+		addTarget.children().each(wrapBind);
+		
+		rearrangeIndex(mel);
+
+		function wrapBind(){
+			mel._groups.push(this);
+			// remove event
+			$(this).children("button").click(function(){
+				var $curMediaEl = $(this).closest(".media"),
+					curMediaEl = $curMediaEl.get(0),
+					mediaIdx;
+
+				if ( ( mediaIdx = mel._groups.indexOf(curMediaEl) ) != -1) {
+					mel._groups.splice(mediaIdx, 1);
+					rearrangeIndex(mel);
+				}
+				$curMediaEl.remove();
+			});
+
+			$(this).find("[name]").each(function(nidx, nel){
+				nel._originName = $(nel).attr("name");
+			});
+		}
+
+		addButton.click(function(){
+
+			addTarget.append( document.importNode(tplMainContent, true) );
+
+			var $newEl = addTarget.children().last(),
+				newAnchor = $newEl.find('.media-body'),
+				newEl = $newEl.get(0);
+
+			$self.find("input,select").each(function(){
+				var $inputSelf = $(this);
+
+				var mapName = $inputSelf.parent().attr("map-name");
+
+				var tplInnerContent = $self.siblings("template[type='" + mapName + "']").get(0).content;
+
+				newAnchor.append( document.importNode(tplInnerContent, true) )
+
+				var tagname = $inputSelf[0].tagName.toLowerCase();
+				if ( tagname == "input" ) {
+					newAnchor.find('[text-label]').last().text($inputSelf.val());
+				} else if ( tagname == "select" ) {
+					newAnchor.find('[text-label]').last().text($inputSelf.find(":selected").text());
+				}
+				newAnchor.find('[text-content]').last().val($inputSelf.val());
+
+				$inputSelf.val("");
+			});
+
+			wrapBind.call(newEl);
+
+			rearrangeIndex(mel);
+		});
+	});
 });
 
 

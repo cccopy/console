@@ -32,6 +32,17 @@ const detailStatusOptions = [
     "成品已確認"
 ];
 
+const globals = {
+    submitFactorOptions: [
+        { label: "單行文字", value: "string" },
+        { label: "多行文字", value: "text" },
+        { label: "圖片", value: "image" },
+        { label: "影片", value: "video" },
+        { label: "聲音", value: "audio" },
+        { label: "文件", value: "file" }
+    ]
+};
+
 // route middleware to make sure a user is logged in
 function loginRequired(req, res, next) {
     // if user is authenticated in the session, carry on
@@ -64,9 +75,18 @@ function collectFields(layouts){
     }
 }
 
+function findSelectionLabel(val, selections) {
+    var resOptions = _.filter(selections, op => op.value == val);
+    return resOptions.length ? resOptions[0].label : "";
+}
+
 function getRelatedData(fields){
     const relatedFields = _.filter(fields, fd => !!fd.related );
     let relatedData = {};
+
+    Object.keys(globals).forEach(key => {
+        relatedData["globals." + key] = globals[key];
+    });
 
     let relatedPromises = relatedFields.map( fd => {
         return interface["get" + capitalize(pluralize(fd.related))]()
@@ -324,11 +344,15 @@ module.exports = function(app, passport) {
                     _.each(mutableData[fd.name] || [], function(data){
                         var imageFiles = _.filter(fd.fields, f => f.type == "image-file" );
                         var strings = _.filter(fd.fields, f => f.type == "video-url" );
+                        var selections = _.filter(fd.fields, f => f.type == "string" && f.layout == "selection" );
                         _.each(imageFiles, function(f){
                             if (data[f.name]) data[f.name] = data[f.name].url;
                         });
                         _.each(strings, function(f){
                             if (data[f.name]) data[f.name] = getYoutubeThumbnail(data[f.name]);
+                        });
+                        _.each(selections, function(f){
+                            if (data[f.name]) data[f.name] = findSelectionLabel(data[f.name], relatedData[f.related]);
                         });
                     });
                 });

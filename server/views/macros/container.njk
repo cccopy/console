@@ -13,7 +13,7 @@
 {% endif %}
 {% endmacro %}
 
-{% macro parseField(field, data={}, aryname='', aryidx='', noname=false) %}
+{% macro parseField(field, data={}, aryname='', aryidx='', noname=false, relateds={}) %}
 {% set fieldname = field.name %}
 {% if aryname|length %}
 	{% set fieldname = aryname + "[" + aryidx + "][" + field.name + "]" %}
@@ -25,6 +25,8 @@
 	{% set placeholder = field|getPlace %}
 	{% if field.layout == 'button' %}
 		{{ forms.textbutton(fieldname, label=field.label, placeholder=placeholder) }}
+	{% elif field.layout == 'selection' %}
+		{{ forms.selection(fieldname, tip=field.tip, options=relateds[field.related], value=data[field.name], emptylabel=field.emptylabel) }}
 	{% else %}
 		{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
 	{% endif %}
@@ -47,6 +49,8 @@
 		{{ editlist(fieldname, field.fields, data[field.name]) }}
 	{% elif field.layout == 'media-sort-list' %}
 		{{ mediasortlist(fieldname, field.fields, data[field.name]) }}
+	{% elif field.layout == 'field-sort-list' %}
+		{{ fieldsortlist(fieldname, field.fields, data) }}
 	{% endif %}
 {% endif %}
 {% endmacro %}
@@ -185,6 +189,52 @@
 	{{ parseField(field, noname=true) }}
 	</div>
 {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro fieldsortlist(name, fields, data) %}
+<div class="row mb-3">
+	{% set datalist = data[name] %}
+	{% for ddata in datalist %}
+		<div class="media align-items-center bg-white ui-bordered col-md-6">
+			<div class="sort-item-move ion ion-ios-move text-muted text-big p-3"></div>
+			<div class="media-body p-2">
+				{% set didx = loop.index0 %}
+				{{ forms.hiddenfield('_order', value=didx) }}
+				{% for field in fields %}
+				{% set htmlcontent = '<' + field.htmlwrap + ' class="' + field.htmlclass + '">' + ddata[field.name] + '</' + field.htmlwrap + '>'%}
+				{{ htmlcontent | safe }}
+				{% endfor %}
+			</div>
+			<button type="button" class="btn btn-outline-danger borderless icon-btn d-block">
+				<i class="ion ion-md-close"></i>
+			</button>
+		</div>	
+	{% endfor %}
+</div>
+<template type="main-wrap">
+	<div class="media align-items-center bg-white ui-bordered col-md-6">
+		<div class="sort-item-move ion ion-ios-move text-muted text-big p-3"></div>
+		<div class="media-body p-2"></div>
+		<button type="button" class="btn btn-outline-danger borderless icon-btn d-block">
+			<i class="ion ion-md-close"></i>
+		</button>
+	</div>
+</template>
+{% for field in fields %}
+<template type="{{ field.name }}">
+	{% set htmlcontent = '<' + field.htmlwrap + ' class="' + field.htmlclass + '" text-label></' + field.htmlwrap + '>' %}
+	{{ htmlcontent | safe }}
+	{{ forms.hiddenfield(field.name, prop='text-content') }}
+</template>
+{% endfor %}
+<div class="form-inline" fieldsortlist-inputs fieldsortlist-prefix="{{ name }}">
+{% for field in fields %}
+	<div class="input-group" map-name="{{ field.name }}">
+	{{ parseField(field, relateds=data._relateds, noname=true) }}
+	</div>
+{% endfor %}
+<button type="button" class="btn btn-outline-primary ml-2"><i class="ion ion-md-add"></i> </button>
 </div>
 {% endmacro %}
 

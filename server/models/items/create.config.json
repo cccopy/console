@@ -191,19 +191,24 @@
 					"label": "用戶需提交素材",
 					"type": "json",
 					"required": true,
-					"layout": "list",
+					"layout": "field-sort-list",
 					"fields": [
 						{
-							"name": "field",
+							"name": "title",
 							"type": "string",
-							"layout": "selection",
-							"label": "選項群組"
+							"label": "問題敍述",
+							"htmlwrap": "label",
+							"htmlclass": "form-label"
 						},
 						{
-							"name": "values",
-							"type": "json",
-							"layout": "tags-selection",
-							"label": "對應值清單"
+							"name": "type",
+							"type": "string",
+							"related": "globals.submitFactorOptions",
+							"layout": "selection",
+							"label": "資料型別",
+							"emptylabel": " -- 請選擇型別 -- ",
+							"htmlwrap": "p",
+							"htmlclass": "text-muted m-0"
 						}
 					]
 				}
