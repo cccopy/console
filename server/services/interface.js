@@ -123,6 +123,17 @@ module.exports = {
 				.catch( err => reject(err) );
 		});
 	},
+	getClients: function(query){
+		var params = { _limit: -1 };
+		query = query || {};
+		if (typeof query.offset !== "undefined") params._start = query.offset;
+		if (typeof query.limit !== "undefined") params._limit = query.limit;
+		return new Promise(function(resolve, reject){
+			axiosIns.get(methods.clients, { params: params })
+				.then( response => resolve(response.data) )
+				.catch( err => reject(err) );
+		});
+	},
 	updateOrder: function(id, data){
 		return new Promise(function(resolve, reject){
 			axiosIns.put(methods.orders + "/" + id, data)

@@ -1,0 +1,23 @@
+{
+	"layout": "grid",
+	"fields": [
+		{
+			"name": "name",
+			"label": "姓名",
+			"link": ":id/update"
+		},
+		{
+			"name": "nickname",
+			"label": "暱稱"
+		},
+		{
+			"name": "email",
+			"label": "Email"
+		},
+		{
+			"name": "created_at",
+			"label": "加入時間",
+			"formatFn": "dateFormat"
+		}
+	]
+}

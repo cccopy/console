@@ -18,5 +18,20 @@
 		"title": "訂單管理",
 		"iconClass": "ion ion-md-business",
 		"url": "/orders/"
+	},
+	{
+		"title": "會員管理",
+		"iconClass": "ion ion-md-business",
+		"urlbase": "/clients",
+		"items": [
+			{
+				"title": "列表",
+				"url": "/"
+			},
+			{
+				"title": "新增",
+				"url": "/create"
+			}
+		]
 	}
 ]
