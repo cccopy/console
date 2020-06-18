@@ -1,0 +1,86 @@
+{
+    "layout": "tabs",
+    "sections": [
+        {
+            "title": "基本資料",
+            "id": "tab-basic",
+            "fields": [
+                {
+                    "name": "email",
+                    "type": "string",
+                    "required": true,
+                    "label": "電子郵件(登入帳號)"
+                },
+                {
+                    "name": "pw",
+                    "label": "密碼",
+                    "type": "password",
+                    "required": true
+                },
+                {
+                    "name": "name",
+                    "label": "姓名",
+                    "required": true,
+                    "type": "string"
+                },
+                {
+                    "name": "nickname",
+                    "label": "暱稱",
+                    "type": "string"
+                },
+                {
+                    "name": "cellphone",
+                    "label": "手機",
+                    "type": "string"
+                },
+                {
+                    "name": "phone",
+                    "label": "電話",
+                    "type": "string"
+                },
+
+                {
+                    "name": "city",
+                    "label": "縣市",
+                    "type": "string"
+                },
+                {
+                    "name": "county",
+                    "label": "行政區",
+                    "type": "string"
+                },
+                {
+                    "name": "address",
+                    "label": "地址",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "title": "公司",
+            "id": "tab-company",
+            "fields": [
+                {
+                    "name": "company",
+                    "label": "公司名稱",
+                    "type": "string"
+                },
+                {
+                    "name": "taxId",
+                    "label": "公司統編",
+                    "type": "string"
+                },
+                {
+                    "name": "industryCategory",
+                    "label": "產業別",
+                    "type": "string"
+                },
+                {
+                    "name": "jobTitle",
+                    "label": "職稱",
+                    "type": "string"
+                }
+            ]
+        }
+    ]
+}

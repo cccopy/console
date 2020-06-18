@@ -9,10 +9,18 @@
 <input type="hidden" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" {% if valuefor|length %}valuefor="{{ valuefor }}"{% endif %} {% if prop|length %}{{ prop }}{% endif %}>
 {% endmacro %}
 
-{% macro textfield(name, label='', value='', placeholder='', tip='') %}	
+{% macro textfield(name, label='', value='', placeholder='', tip='', secret=false) %}	
 {% if label|length %}{{ label }}{% endif %}
-<input type="text" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" class="form-control" placeholder="{{ placeholder }}">
+{% set thetype = 'text' %}
+{% if secret %}
+	{% set thetype = 'password' %}
+{% endif %}
+<input type="{{thetype}}" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" class="form-control" placeholder="{{ placeholder }}">
 {{ fieldtip(tip) }}
+{% endmacro %}
+
+{% macro passwordfield(name, label='', value='', placeholder='', tip='') %}	
+{{ textfield(name, label, value, placeholder, tip, true) }}
 {% endmacro %}
 
 {% macro textareafield(name, label='', rows=3, value='', placeholder='', tip='') %}

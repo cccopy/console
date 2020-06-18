@@ -52,6 +52,9 @@
 	{% elif field.layout == 'field-sort-list' %}
 		{{ fieldsortlist(fieldname, field.fields, data) }}
 	{% endif %}
+{% elif field.type == 'password' %}
+{% set placeholder = field|getPlace %}
+{{ forms.passwordfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
 {% endif %}
 {% endmacro %}
 
