@@ -134,6 +134,13 @@ module.exports = {
 				.catch( err => reject(err) );
 		});
 	},
+	createClient: function(data){
+		return new Promise(function(resolve, reject){
+			axiosIns.post(methods.clients, data)
+				.then(function(response){ resolve(response.data); })
+				.catch( err => reject(err) );
+		});
+	},
 	updateOrder: function(id, data){
 		return new Promise(function(resolve, reject){
 			axiosIns.put(methods.orders + "/" + id, data)

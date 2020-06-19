@@ -26,16 +26,16 @@
 	{% if field.layout == 'button' %}
 		{{ forms.textbutton(fieldname, label=field.label, placeholder=placeholder) }}
 	{% elif field.layout == 'selection' %}
-		{{ forms.selection(fieldname, tip=field.tip, options=relateds[field.related], value=data[field.name], emptylabel=field.emptylabel) }}
+		{{ forms.selection(fieldname, tip=field.tip, options=relateds[field.related], value=data[field.name], emptylabel=field.emptylabel, required=field.required) }}
 	{% else %}
-		{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+		{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder, required=field.required) }}
 	{% endif %}
 {% elif field.type == 'text' %}
 	{% set placeholder = field|getPlace %}
-	{{ forms.textareafield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+	{{ forms.textareafield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder, required=field.required) }}
 {% elif field.type == 'integer' %}
 	{% set placeholder = field|getPlace %}
-	{{ forms.numberfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+	{{ forms.numberfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder, required=field.required) }}
 {% elif field.type == 'image-file' %}
 	{% if field.layout == 'button' %}
 		{{ forms.imagefilebutton(fieldname, label=field.label) }}
@@ -43,7 +43,7 @@
 		{{ forms.imagefilefield(fieldname, value=data[field.name]) }}
 	{% endif %}
 {% elif field.type == 'collection' and field.layout == 'tags-selection' %}
-	{{ forms.tagsselection(fieldname, tip=field.tip, options=data._relateds[field.related], values=data[field.name], autoCreate=field.autoCreate) }}
+	{{ forms.tagsselection(fieldname, tip=field.tip, options=data._relateds[field.related], values=data[field.name], autoCreate=field.autoCreate, required=field.required) }}
 {% elif field.type == 'json' %}
 	{% if field.layout == 'list' %}
 		{{ editlist(fieldname, field.fields, data[field.name]) }}

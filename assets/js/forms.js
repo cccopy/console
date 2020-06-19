@@ -20,8 +20,12 @@ $(function() {
 	});
 
 	$("button[container-save]").click(function(){
-		$self = $(this);
-		$self.attr("status", "loading").prop("disabled", true);
-		$self.closest("form").submit();
+		var $self = $(this);
+		var $jqForm = $self.closest("form");
+		var formEl = $jqForm.length ? $jqForm.get(0) : null;
+		if (formEl && formEl.reportValidity()) {
+			$self.attr("status", "loading").prop("disabled", true);
+			$jqForm.submit();
+		}
 	});
 });

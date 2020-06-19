@@ -9,33 +9,33 @@
 <input type="hidden" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" {% if valuefor|length %}valuefor="{{ valuefor }}"{% endif %} {% if prop|length %}{{ prop }}{% endif %}>
 {% endmacro %}
 
-{% macro textfield(name, label='', value='', placeholder='', tip='', secret=false) %}	
+{% macro textfield(name, label='', value='', placeholder='', tip='', secret=false, required=false) %}	
 {% if label|length %}{{ label }}{% endif %}
 {% set thetype = 'text' %}
 {% if secret %}
 	{% set thetype = 'password' %}
 {% endif %}
-<input type="{{thetype}}" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" class="form-control" placeholder="{{ placeholder }}">
+<input type="{{thetype}}" {% if name|length %}name="{{ name }}"{% endif %} value="{{ value | escape }}" class="form-control" placeholder="{{ placeholder }}" {% if required %}required{% endif %}>
 {{ fieldtip(tip) }}
 {% endmacro %}
 
 {% macro passwordfield(name, label='', value='', placeholder='', tip='') %}	
-{{ textfield(name, label, value, placeholder, tip, true) }}
+{{ textfield(name, label, value, placeholder, tip, true, true) }}
 {% endmacro %}
 
-{% macro textareafield(name, label='', rows=3, value='', placeholder='', tip='') %}
+{% macro textareafield(name, label='', rows=3, value='', placeholder='', tip='', required=false) %}
 {% if label|length %}{{ label }}{% endif %}
-<textarea class="form-control" {% if name|length %}name="{{ name }}"{% endif %} rows="{{ rows }}" placeholder="{{ placeholder }}">{{ value | escape }}</textarea>
+<textarea class="form-control" {% if name|length %}name="{{ name }}"{% endif %} rows="{{ rows }}" placeholder="{{ placeholder }}" {% if required %}required{% endif %}>{{ value | escape }}</textarea>
 {{ fieldtip(tip) }}
 {% endmacro %}
 
-{% macro numberfield(name, label='', min=0, max=100000, step=1000, value='', placeholder='', tip='') %}
+{% macro numberfield(name, label='', min=0, max=100000, step=1000, value='', placeholder='', tip='', required=false) %}
 {% if label|length %}{{ label }}{% endif %}
 <div class="input-group">
 	<div class="input-group-prepend">
 		<div class="input-group-text">$</div>
 	</div>
-	<input type="number" {% if name|length %}name="{{ name }}"{% endif %} min="{{ min }}" max="{{ max }}" step="{{ step }}" class="form-control" value="{{ value | escape }}" placeholder="{{ placeholder }}">
+	<input type="number" {% if name|length %}name="{{ name }}"{% endif %} min="{{ min }}" max="{{ max }}" step="{{ step }}" class="form-control" value="{{ value | escape }}" placeholder="{{ placeholder }}" {% if required %}required{% endif %}>
 </div>
 {{ fieldtip(tip) }}
 {% endmacro %}
@@ -88,9 +88,9 @@
 <button type="button" class="btn btn-outline-primary"><i class="ion ion-md-add"></i> {{ label }}</button>
 {% endmacro %}
 
-{% macro tagsselection(name, label='', options=[], values=[], tip='', autoCreate=false) %}
+{% macro tagsselection(name, label='', options=[], values=[], tip='', autoCreate=false, required=false) %}
 {% if label|length %}{{ label }}{% endif %}
-<select {% if name|length %}name="{{ name + '[]' }}"{% endif %} class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %}>
+<select {% if name|length %}name="{{ name + '[]' }}"{% endif %} class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %} {% if required %}required{% endif %}>
 	{% for opt in options %}
 	{% set selected = false %}
 	{% if values|length and opt.value in values %}
@@ -102,9 +102,9 @@
 {{ fieldtip(tip) }}
 {% endmacro %}
 
-{% macro selection(name, label='', options=[], value='', tip='', emptylabel='Choose...') %}
+{% macro selection(name, label='', options=[], value='', tip='', emptylabel='Choose...', required=false) %}
 {% if label|length %}{{ label }}{% endif %}
-<select {% if name|length %}name="{{ name }}"{% endif %} class="form-control">
+<select {% if name|length %}name="{{ name }}"{% endif %} class="form-control" {% if required %}required{% endif %}>
 	<option value="">{{ emptylabel }}</option>
 	{% for opt in options %}
 	{% set selected = false %}

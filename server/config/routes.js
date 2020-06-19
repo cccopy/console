@@ -7,6 +7,7 @@ var interface = require('../services/interface');
 var nunjucks = require('nunjucks');
 var isDev = process.env.NODE_ENV === 'development';
 var _ = require('lodash');
+var md5 = require('md5');
 var FileHandler = require('../services/file-handler');
 var pluralize = require('pluralize');
 var glob = require("glob");
@@ -18,6 +19,7 @@ var menus = require('../models/menus.config.json');
 var widgets = require('../models/widgets.config.json');
 
 var items_createLayout = require('../models/items/create.config.json');
+var clients_createLayout = require('../models/clients/create.config.json');
 
 const detailStatusOptions = [
     "等待審核素材",
@@ -325,6 +327,23 @@ module.exports = function(app, passport) {
         mergeCollectionRelateds(fields, mutableData)
             .then( () => { return fileHandler.exec() })
             .then(function(){ return interface.createItem(mutableData) })
+            .then(function(result){ res.redirect('/items/'); })
+            .catch(function(err){ console.log(err) });
+    });
+
+    app.post('/clients/create', loginRequired, function(req, res){
+        const fields = collectFields(clients_createLayout);
+        const secreteFields = _.filter(fields, function(fd){ return fd.type == "password" });
+        let mutableData = _.cloneDeep(req.body);
+
+        _.each(secreteFields, fd => {
+            let targetVal = mutableData[fd.name];
+            mutableData[fd.name] = md5(targetVal);
+        });
+
+        // fields, mutableData
+        mergeCollectionRelateds(fields, mutableData)
+            .then(function(){ return interface.createClient(mutableData) })
             .then(function(result){ res.redirect('/items/'); })
             .catch(function(err){ console.log(err) });
     });
