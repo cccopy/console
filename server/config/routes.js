@@ -349,6 +349,22 @@ module.exports = function(app, passport) {
             .catch(function(err){ console.log(err) });
     });
 
+    app.get('/clients/:id/detail', loginRequired, function(req, res, next){
+        const lookid = req.params.id;
+
+        interface.getClient({ id: lookid })
+            .then(function(results){
+                if ( results && results.length ){
+                    let mutableData = results[0];
+                    res.render('clients/_id/detail', { 
+                        // layouts: items_createLayout,
+                        data: mutableData
+                    } );
+                } else notFound(res);
+            })
+            .catch(next);
+    });
+
     app.get('/items/:id/update', loginRequired, function(req, res, next){
         const lookid = req.params.id,
             fields = collectFields(items_createLayout),

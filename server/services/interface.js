@@ -134,6 +134,15 @@ module.exports = {
 				.catch( err => reject(err) );
 		});
 	},
+	getClient: function(condition){
+		var params = {};
+		if (typeof condition.id !== "undefined") params.id = condition.id;
+		return new Promise(function(resolve, reject){
+			axiosIns.get(methods.clients, { params: params })
+				.then(function(response){ resolve(response.data); })
+				.catch( err => reject(err) );
+		});
+	},
 	createClient: function(data){
 		return new Promise(function(resolve, reject){
 			axiosIns.post(methods.clients, data)

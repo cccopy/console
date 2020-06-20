@@ -1,0 +1,120 @@
+
+{% extends "layout.njk" %}
+
+{% import "macros/container.njk" as container %}
+
+{% block headtitle %}會員管理 查看 {{ data.name }}{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/assets/vendor/libs/select2/select2.css">
+<link rel="stylesheet" href="/assets/css/containers.css">
+<link rel="stylesheet" href="/assets/css/forms.css">
+{% endblock %}
+
+{% block bodyjs %}
+{{ super() }}
+<script src="/assets/vendor/libs/select2/select2.js"></script>
+<script src="/assets/js/containers.js"></script>
+<script src="/assets/js/forms.js"></script>
+{% endblock %}  
+
+{% block innerContent %}
+<h4 class="font-weight-bold py-3 mb-4">
+    會員管理
+    <span class="text-muted small">查看 {{ data.name }}</span>
+</h4>
+<form method="POST" container-form>
+    
+    <div class="card">
+        <!-- Status -->
+        <div class="card-body">
+            <strong class="mr-2">狀態:</strong>
+            <span class="text-big">
+                {% if data.isVerify %}
+                <span class="badge badge-success">已啟用</span>
+                {% else %}
+                <span class="badge badge-default">未啟用</span>
+                {% endif %}
+            </span>
+            <span class="text-muted small ml-1">{{ data.created_at | useFormatFunction('dateFormat') }} 加入</span>
+        </div>
+        <hr class="m-0">
+        <!-- / Status -->
+        <!-- Info -->
+        <div class="card-body pb-1">
+            <h6 class="small font-weight-semibold">
+              基本資料
+            </h6>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">暱稱</div>
+                    {{ data.nickname }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">電子郵件</div>
+                    {{ data.email }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">手機</div>
+                    {{ data.cellphone }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">電話</div>
+                    {{ data.phone }}
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">縣市</div>
+                    {{ data.city }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">行政區</div>
+                    {{ data.county }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="text-muted small">地址</div>
+                    {{ data.address }}
+                </div>
+            </div>
+        </div>
+        <hr class="m-0">
+        <!-- / Info -->
+
+        <!-- Company -->
+        <div class="card-body">
+            <h6 class="small font-weight-semibold">
+              公司
+            </h6>
+            <div class="row">   
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">公司名稱</div>
+                    {{ data.company }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">公司統編</div>
+                    {{ data.taxId }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">產業別</div>
+                    {{ data.industryCategory }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-muted small">職稱</div>
+                    {{ data.jobTitle }}
+                </div>
+            </div>
+        </div>
+        <hr class="m-0">
+        <!-- / Company -->
+    </div>
+<!-- 
+    <div class="text-right mt-3">
+        <button type="button" class="btn btn-primary" container-save status="normal">
+            <span status-normal>儲存</span>
+            <span status-loading class="spinner-border" role="status" aria-hidden="true"></span>
+            <span status-loading>處理中...</span>
+        </button>
+        <input type="hidden" name="_M" value="PUT">
+    </div> -->
+</form>
+{% endblock %}
