@@ -9,7 +9,8 @@
                     "name": "email",
                     "type": "string",
                     "required": true,
-                    "label": "電子郵件(登入帳號)"
+                    "label": "電子郵件(登入帳號)",
+                    "unique": true
                 },
                 {
                     "name": "pw",

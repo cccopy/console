@@ -135,8 +135,7 @@ module.exports = {
 		});
 	},
 	getClient: function(condition){
-		var params = {};
-		if (typeof condition.id !== "undefined") params.id = condition.id;
+		var params = { ...condition };
 		return new Promise(function(resolve, reject){
 			axiosIns.get(methods.clients, { params: params })
 				.then(function(response){ resolve(response.data); })

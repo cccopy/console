@@ -377,6 +377,19 @@ module.exports = function(app, passport) {
             .catch(next);
     });
 
+    app.get('/clients/uniquecheck/:field/:value', loginRequired, function(req, res, next){
+        const field = req.params.field;
+        const value = req.params.value;
+        const params = {};
+        params[field] = value;
+        interface.getClient(params)
+            .then(function(results){
+                if ( results && results.length ) res.send("fail");
+                else res.send("ok");
+            })
+            .catch(next);
+    });
+
     app.get('/items/:id/update', loginRequired, function(req, res, next){
         const lookid = req.params.id,
             fields = collectFields(items_createLayout),

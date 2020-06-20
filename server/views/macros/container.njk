@@ -28,7 +28,7 @@
 	{% elif field.layout == 'selection' %}
 		{{ forms.selection(fieldname, tip=field.tip, options=relateds[field.related], value=data[field.name], emptylabel=field.emptylabel, required=field.required) }}
 	{% else %}
-		{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder, required=field.required) }}
+		{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder, required=field.required, unique=field.unique) }}
 	{% endif %}
 {% elif field.type == 'text' %}
 	{% set placeholder = field|getPlace %}

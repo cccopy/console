@@ -1,6 +1,7 @@
 
 // Select2
 $(function() {
+	var blockSubmit = false;
 	$('.select2-tags').each(function() {
 		var self = $(this);
 		self.wrap('<div class="position-relative"></div>')
@@ -23,9 +24,31 @@ $(function() {
 		var $self = $(this);
 		var $jqForm = $self.closest("form");
 		var formEl = $jqForm.length ? $jqForm.get(0) : null;
-		if (formEl && formEl.reportValidity()) {
+		if (!blockSubmit && formEl && formEl.reportValidity()) {
 			$self.attr("status", "loading").prop("disabled", true);
 			$jqForm.submit();
 		}
+	});
+
+	$("input[unique]").blur(function(){
+		var $self = $(this);
+		var $jqForm = $self.closest("form");
+		var inputEl = $self.get(0);
+		var value = $self.val();
+		$self.removeClass("is-valid is-invalid");
+		blockSubmit = true;
+		$.get({
+			url: ["uniquecheck", $self.attr("name"), value].join("/")
+		})
+		.done(function(res){
+			blockSubmit = false;
+			if (res == "fail") {
+				$self.addClass("is-invalid");
+				inputEl.setCustomValidity(value + " is already in use.");
+			} else if (res == "ok") {
+				$self.addClass("is-valid");
+				inputEl.setCustomValidity("");
+			}
+		});
 	});
 });
