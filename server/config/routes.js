@@ -191,6 +191,7 @@ module.exports = function(app, passport) {
     nunEnv.addFilter("useFormatFunction", function(val, fnName){
         if (fnName) {
             if ( fnName == "dateFormat" ) return utils.dateToNormalFormat(new Date(val));
+            if ( fnName == "numbers" ) return utils.tupleNumbers(val);
         }
         return val;
     });

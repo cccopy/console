@@ -18,6 +18,11 @@
 			"name": "created_at",
 			"label": "加入時間",
 			"formatFn": "dateFormat"
+		},
+		{
+			"name": "orders",
+			"label": "訂單數量",
+			"formatFn": "numbers"
 		}
 	]
 }

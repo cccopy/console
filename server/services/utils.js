@@ -84,3 +84,6 @@ exports.dateToNormalFormat = function(dte, split){
 	return [year.toString(), lessTenAddZero(month), lessTenAddZero(day)].join(split);
 };
 
+exports.tupleNumbers = function(tuples){
+	return tuples.length.toString();
+};
