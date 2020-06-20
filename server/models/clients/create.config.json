@@ -53,6 +53,12 @@
                     "name": "address",
                     "label": "地址",
                     "type": "string"
+                },
+                {
+                    "name": "isVerify",
+                    "type": "boolean",
+                    "layout": "hidden",
+                    "defaultValue": true
                 }
             ]
         },

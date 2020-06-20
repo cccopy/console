@@ -55,6 +55,8 @@
 {% elif field.type == 'password' %}
 {% set placeholder = field|getPlace %}
 {{ forms.passwordfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder) }}
+{% elif field.layout == 'hidden' %}
+{{ forms.hiddenfield(field.name, value=field.defaultValue) }}
 {% endif %}
 {% endmacro %}
 
@@ -84,7 +86,7 @@
 			<div class="card-body">
 			{% set fields = sec.fields %}
 			{% for field in fields %}
-				{% if loop.length == 1 %}
+				{% if loop.length == 1 or field.layout == 'hidden' %}
 				{{ parseField(field, data) }}
 				{% else %}
 				{{ parseFormField(field, data) }}
