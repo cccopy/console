@@ -192,6 +192,7 @@ module.exports = function(app, passport) {
         if (fnName) {
             if ( fnName == "dateFormat" ) return utils.dateToNormalFormat(new Date(val));
             if ( fnName == "numbers" ) return utils.tupleNumbers(val);
+            if ( fnName == "yesOrNo" ) return utils.booleanText(utils.parseBoolean(val));
         }
         return val;
     });

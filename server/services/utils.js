@@ -87,3 +87,17 @@ exports.dateToNormalFormat = function(dte, split){
 exports.tupleNumbers = function(tuples){
 	return tuples.length.toString();
 };
+
+exports.parseBoolean = function(boolValue, defaultValue){
+	const booleanValidValues = [true, false, "true", "false", 1, 0];
+	let valIdx = booleanValidValues.indexOf(boolValue);
+    if (valIdx == -1 && typeof defaultValue !== "undefined") {
+        valIdx = booleanValidValues.indexOf(defaultValue);
+    }
+    valIdx = valIdx == -1 ? 0 : valIdx;
+    return valIdx % 2 == 0;
+};
+
+exports.booleanText = function(boolValue){
+	return boolValue ? "是" : "否";
+};

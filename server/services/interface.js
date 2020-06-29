@@ -184,10 +184,11 @@ module.exports = {
 				.catch( err => reject(err) );
 		});	
 	},
-	getKeywords: function(offset, limit){
+	getKeywords: function(query){
 		var params = { _limit: -1 };
-		if (typeof offset !== "undefined") params._start = offset;
-		if (typeof limit !== "undefined") params._limit = limit;
+		query = query || {};
+		if (typeof query.offset !== "undefined") params._start = query.offset;
+		if (typeof query.limit !== "undefined") params._limit = query.limit;
 		return new Promise(function(resolve, reject){
 			axiosIns.get(methods.keyword, { params: params })
 				.then(function(response){

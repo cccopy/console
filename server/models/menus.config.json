@@ -33,5 +33,10 @@
 				"url": "/create"
 			}
 		]
+	},
+	{
+		"title": "關鍵字",
+		"iconClass": "ion ion-md-business",
+		"url": "/keywords/"
 	}
 ]

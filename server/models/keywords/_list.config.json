@@ -1,0 +1,19 @@
+{
+	"layout": "grid",
+	"fields": [
+		{
+			"name": "id",
+			"label": "ID"
+		},
+		{
+			"name": "word",
+			"label": "關鍵字"
+		},
+		{
+			"name": "inSearchBar",
+			"label": "預設搜尋",
+			"type": "boolean",
+			"formatFn": "yesOrNo"
+		}
+	]
+}
