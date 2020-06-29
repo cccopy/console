@@ -360,11 +360,11 @@ $(function(){
 			buttonWrap.click(function(){
 				var theSelectIdx = parseInt(selectWrap.val());
 				var checkeds = $(container).find(checkSelector + ":checked");
-				var promises = [];
 				if (!isNaN(theSelectIdx) && checkeds.length){
 					buttonWrap.prop("disabled", true);
 					
-					var info = infos[theSelectIdx];
+					var promises = [],
+						info = infos[theSelectIdx];
 					
 					checkeds.each(function(){
 						var ajaxObj = {
@@ -380,11 +380,12 @@ $(function(){
 						// console.log(ajaxObj);
 						promises.push($.ajax(ajaxObj));
 					});
+
+					Promise.all(promises)
+						.then(function(){
+							location.reload(true);
+						});
 				}
-				Promise.all(promises)
-					.then(function(){
-						location.reload(true);
-					});
 			});
 		}
 
