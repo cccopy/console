@@ -203,5 +203,19 @@ module.exports = {
 				.then(function(response){ resolve(response.data); })
 				.catch( err => reject(err) );
 		});
+	},
+	updateKeyword: function(id, data){
+		return new Promise(function(resolve, reject){
+			axiosIns.put(methods.keyword + "/" + id, data)
+				.then(function(response){ resolve(response.data); })
+				.catch( err => reject(err) );
+		});	
+	},
+	removeKeyword: function(id){
+		return new Promise(function(resolve, reject){
+			axiosIns.delete(methods.keyword + "/" + id)
+				.then(function(response){ resolve(); })
+				.catch( err => reject(err) );
+		});		
 	}
 }

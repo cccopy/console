@@ -20,6 +20,7 @@ var widgets = require('../models/widgets.config.json');
 
 var items_createLayout = require('../models/items/create.config.json');
 var clients_createLayout = require('../models/clients/create.config.json');
+var keywords_listLayout = require('../models/keywords/_list.config.json');
 
 const detailStatusOptions = [
     "等待審核素材",
@@ -154,6 +155,7 @@ function mergeCollectionRelateds(fields, mutableData){
 
 function notFound(res){ res.status(404).send("Not found."); }
 function badRequest(res){ res.status(400).send("Bad request."); }
+function sendOk(res){ res.status(200).send("Ok."); }
 
 module.exports = function(app, passport) {
 
@@ -195,6 +197,14 @@ module.exports = function(app, passport) {
             if ( fnName == "yesOrNo" ) return utils.booleanText(utils.parseBoolean(val));
         }
         return val;
+    });
+
+    nunEnv.addFilter('json', function (value, spaces) {
+        if (value instanceof nunjucks.runtime.SafeString) {
+            value = value.toString();
+        }
+        const jsonString = JSON.stringify(value, null, spaces).replace(/</g, '\\u003c');
+        return nunjucks.runtime.markSafe(jsonString);
     });
 
     nunEnv.addFilter("locale", function(num){
@@ -593,6 +603,32 @@ module.exports = function(app, passport) {
             .then(function(){
                 res.redirect('/orders/' +  lookid + '/update');
             })
+            .catch(next);
+    });
+
+    // =====================================
+    // AJAX ================================
+    // =====================================
+    app.put('/keywords/:id/ajax/update', loginRequired, function(req, res, next){
+        const lookid = req.params.id;
+        const fields = collectFields(keywords_listLayout);
+        const booleanFields = _.filter(fields, function(fd){ return fd.type == "boolean" });
+        const mutableData = _.cloneDeep(req.body)
+        
+        _.each(booleanFields, fd => {
+            let targetVal = mutableData[fd.name];
+            mutableData[fd.name] = utils.parseBoolean(targetVal, fd.defaultValue);
+        });
+
+        interface.updateKeyword(lookid, mutableData)
+            .then(function(){ sendOk(res) })
+            .catch(next);
+    });
+    
+    app.delete('/keywords/:id/ajax/delete', loginRequired, function(req, res, next){
+        const lookid = req.params.id;
+        interface.removeKeyword(lookid)
+            .then(function(){ sendOk(res) })
             .catch(next);
     });
 

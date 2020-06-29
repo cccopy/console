@@ -243,11 +243,16 @@
 </div>
 {% endmacro %}
 
-{% macro gridview(fields, datalist=[]) %}
+{% macro gridview(fields, datalist=[], layouts={}) %}
 <div class="table-responsive">
+	{% set hasAction = layouts.actions|length %}
 	<table class="gridview table table-striped table-bordered">
 		<thead>
 			<tr>
+				{% if hasAction %}
+				<th style="width:20px;" class="no-sort"></th>
+				<th class="action-infos" style="display:none;">{{layouts.actions|json}}</th>
+				{% endif %}
 				{% for field in fields %}
 				<th {% if field.width|length %}style="width: {{ field.width }}"{% endif %}>{{ field.label }}</th>
 				{% endfor %}
@@ -257,6 +262,13 @@
 		{% if datalist|length %}
 			{% for data in datalist %}
 			<tr>
+				{% if hasAction %}
+				<td>
+					<label class="form-check">
+						<input class="form-check-input" type="checkbox" value="{{data.id}}">
+	                </label>
+				</td>
+				{% endif %}
 				<!-- <th scope="row">1</th> -->
 				{% for field in fields %}
 				<td>

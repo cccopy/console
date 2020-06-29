@@ -15,5 +15,26 @@
 			"type": "boolean",
 			"formatFn": "yesOrNo"
 		}
+	],
+	"actions": [
+		{
+			"label": "設為預設搜尋",
+			"url": ":id/ajax/update",
+			"field": "inSearchBar",
+			"value": true,
+			"method": "put"
+		},
+		{
+			"label": "取消預設搜尋",
+			"url": ":id/ajax/update",
+			"field": "inSearchBar",
+			"value": false,
+			"method": "put"
+		},
+		{
+			"label": "刪除",
+			"url": ":id/ajax/delete",
+			"method": "delete"
+		}
 	]
 }

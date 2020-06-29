@@ -289,6 +289,105 @@ $(function(){
 
 $(function(){
 	var views = $(".gridview");
-	if (views.length) views.dataTable( {pageLength: 25} );
+	views.each(function(){
+		var $self = $(this),
+			infoEl = $self.find(".action-infos"),
+			infos = infoEl.length ? JSON.parse(infoEl.text()) : [],
+			dt;
+
+		var checkSelector = 'tr > td:first-child input[type=checkbox]';
+
+		infoEl.remove();
+
+		var dtOptions = {
+			order: [],
+			pageLength: 25
+		}
+
+		if (infos.length) {
+			Object.assign(dtOptions, {
+				columnDefs: [{
+					targets: 'no-sort',
+					orderable: false
+				}],
+				drawCallback: function(settings){
+					// console.log(this);
+					if (!dt) return;
+					var container = dt.api().table().container();
+					var toolwrap = $(container).children(".row:first-child");
+					var actionWrap = toolwrap.find(".form-inline");
+					if ( actionWrap.length ) {
+						if ($(this).find(checkSelector + ":checked").length == 0) actionWrap.hide();
+						else actionWrap.show();
+					}
+				}
+			});
+		}
+		
+		dt = $self.dataTable(dtOptions);
+
+		if (infos.length){
+			var container = dt.api().table().container();
+			var toolwrap = $(container).children(".row:first-child");
+			
+			var options = infos.map(function(info, idx){
+				return '<option value="' + idx + '">' + info.label + '</option>';
+			}).join('');
+			options = '<option>Choose...</option>' + options;
+
+			toolwrap.append('<div class="col-sm-12 col-md-6">'
+				+ '<div class="form-inline mb-sm-2" style="display:none;">'
+					+ '<label>Action</label>'
+					+ '<select class="custom-select custom-select-sm ml-2 mr-2">' + options + '</select>'
+					+ '<button type="button" class="btn btn-sm btn-default">Go</button>'
+				+ '</div>' 
+			+ '</div>'
+			);
+
+			var actionWrap = toolwrap.find(".form-inline");
+			
+			$self.on('change', checkSelector, function(){
+				if (this.checked) {
+					actionWrap.show();
+				} else if ($(this.closest("tbody")).find(checkSelector + ":checked").length == 0){
+					actionWrap.hide();
+				}
+			});
+
+			var buttonWrap = actionWrap.find("button");
+			var selectWrap = actionWrap.find("select");
+
+			buttonWrap.click(function(){
+				var theSelectIdx = parseInt(selectWrap.val());
+				var checkeds = $(container).find(checkSelector + ":checked");
+				var promises = [];
+				if (!isNaN(theSelectIdx) && checkeds.length){
+					buttonWrap.prop("disabled", true);
+					
+					var info = infos[theSelectIdx];
+					
+					checkeds.each(function(){
+						var ajaxObj = {
+							method: info.method,
+							url: info.url.replace(":id", this.value)
+						};
+
+						if (info.field && typeof info.value !== "undefined") {
+							var data = {};
+							data[info.field] = info.value;
+							ajaxObj.data = data;
+						}
+						// console.log(ajaxObj);
+						promises.push($.ajax(ajaxObj));
+					});
+				}
+				Promise.all(promises)
+					.then(function(){
+						location.reload(true);
+					});
+			});
+		}
+
+	});
 });
 
