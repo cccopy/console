@@ -347,7 +347,6 @@ module.exports = function(app, passport) {
         const fields = collectFields(clients_createLayout);
         const secreteFields = _.filter(fields, function(fd){ return fd.type == "password" });
         const booleanFields = _.filter(fields, function(fd){ return fd.type == "boolean" });
-        const booleanValidValues = [true, false, "true", "false", 1, 0];
         let mutableData = _.cloneDeep(req.body);
 
         _.each(secreteFields, fd => {
@@ -357,12 +356,7 @@ module.exports = function(app, passport) {
 
         _.each(booleanFields, fd => {
             let targetVal = mutableData[fd.name];
-            let valIdx = booleanValidValues.indexOf(targetVal);
-            if (valIdx == -1 && typeof fd.defaultValue !== "undefined") {
-                valIdx = booleanValidValues.indexOf(fd.defaultValue);
-            }
-            valIdx = valIdx == -1 ? 0 : valIdx;
-            mutableData[fd.name] = valIdx % 2 == 0;
+            mutableData[fd.name] = utils.parseBoolean(targetVal, fd.defaultValue);
         });
 
         // fields, mutableData
