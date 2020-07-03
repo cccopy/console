@@ -244,9 +244,12 @@ module.exports = function(app, passport) {
 
     _.each(layoutNamespace, (actions, modelName) => {
         _.each(actions, (layouts, actionName) => {
+            const singleName = pluralize.singular(modelName);
+            const singleCap = capitalize(singleName);
             let currentPath = [modelName, actionName].join('/'),
-                renderPath = currentPath;
-            if ( actionName == "_list" ) currentPath = [modelName, ""].join('/');
+                renderPath = currentPath,
+                isList = actionName == "_list";
+            if (isList) currentPath = [modelName, ""].join('/');
             app.get('/' + currentPath, loginRequired, (function(path, layout, model, action){
                 if ( action == "_list" ) {
                     return async function(req, res, next) {
@@ -300,7 +303,34 @@ module.exports = function(app, passport) {
                     };
                 }
             })(renderPath, layouts, modelName, actionName) );
-        })
+
+            if (isList) {
+                // =====================================
+                // AJAX ================================
+                // =====================================
+                app.put(`/${modelName}/:id/ajax/update`, loginRequired, function(req, res, next){
+                    const lookid = req.params.id;
+                    const fields = collectFields(layouts);
+                    const booleanFields = _.filter(fields, function(fd){ return fd.type == "boolean" });
+                    const mutableData = _.cloneDeep(req.body);
+                    
+                    _.each(booleanFields, fd => {
+                        let targetVal = mutableData[fd.name];
+                        mutableData[fd.name] = utils.parseBoolean(targetVal, fd.defaultValue);
+                    });
+
+                    interface[`update${singleCap}`](lookid, mutableData)
+                        .then(function(){ sendOk(res) })
+                        .catch(next);
+                });
+                app.delete(`/${modelName}/:id/ajax/delete`, loginRequired, function(req, res, next){
+                    const lookid = req.params.id;
+                    interface[`remove${singleCap}`](lookid)
+                        .then(function(){ sendOk(res) })
+                        .catch(next);
+                });
+            }
+        });
     });
 
     app.post('/items/create', loginRequired, function(req, res){
@@ -600,31 +630,7 @@ module.exports = function(app, passport) {
             .catch(next);
     });
 
-    // =====================================
-    // AJAX ================================
-    // =====================================
-    app.put('/keywords/:id/ajax/update', loginRequired, function(req, res, next){
-        const lookid = req.params.id;
-        const fields = collectFields(keywords_listLayout);
-        const booleanFields = _.filter(fields, function(fd){ return fd.type == "boolean" });
-        const mutableData = _.cloneDeep(req.body)
-        
-        _.each(booleanFields, fd => {
-            let targetVal = mutableData[fd.name];
-            mutableData[fd.name] = utils.parseBoolean(targetVal, fd.defaultValue);
-        });
 
-        interface.updateKeyword(lookid, mutableData)
-            .then(function(){ sendOk(res) })
-            .catch(next);
-    });
-    
-    app.delete('/keywords/:id/ajax/delete', loginRequired, function(req, res, next){
-        const lookid = req.params.id;
-        interface.removeKeyword(lookid)
-            .then(function(){ sendOk(res) })
-            .catch(next);
-    });
 
 
     // =====================================
