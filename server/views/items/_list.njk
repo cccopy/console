@@ -19,6 +19,6 @@
 {% block innerContent %}
 <h4 class="font-weight-bold py-3 mb-4">項目列表</h4>
 {% if layouts.layout == 'grid' %}
-{{ container.gridview(layouts.fields, data) }}
+{{ container.gridview(layouts.fields, data, layouts) }}
 {% endif %}
 {% endblock %}

@@ -2,11 +2,6 @@
 	"layout": "grid",
 	"fields": [
 		{
-			"name": "id",
-			"label": "編號",
-			"width": "8%"
-		},
-		{
 			"name": "title",
 			"label": "項目標題",
 			"link": ":id/update"
@@ -32,6 +27,33 @@
 			"name": "price",
 			"label": "價格",
 			"width": "10%"
+		},
+		{
+			"name": "isHot",
+			"label": "熱門",
+			"type": "boolean",
+			"formatFn": "yesOrNo"
+		}
+	],
+	"actions": [
+		{
+			"label": "設為熱門",
+			"url": ":id/ajax/update",
+			"field": "isHot",
+			"value": true,
+			"method": "put"
+		},
+		{
+			"label": "取消熱門",
+			"url": ":id/ajax/update",
+			"field": "isHot",
+			"value": false,
+			"method": "put"
+		},
+		{
+			"label": "刪除",
+			"url": ":id/ajax/delete",
+			"method": "delete"
 		}
 	]
 }
