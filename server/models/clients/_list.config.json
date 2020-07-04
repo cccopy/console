@@ -24,5 +24,12 @@
 			"label": "訂單數量",
 			"formatFn": "numbers"
 		}
+	],
+	"actions": [
+		{
+			"label": "刪除",
+			"url": ":id/ajax/delete",
+			"method": "delete"
+		}
 	]
 }
