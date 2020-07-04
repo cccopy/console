@@ -8,6 +8,10 @@
 	{% if field.layout == 'imagelist' %}
 		{{ forms.imagelistview(celldata) }}
 	{% endif %}
+{% elif field.type == 'file' %}
+	{% if field.layout == 'imageview' %}
+		{{ forms.imageview(celldata.url, celldata.url) }}
+	{% endif %}
 {% else %}
 {{ celldata | useFormatFunction(field.formatFn) }}
 {% endif %}

@@ -8,5 +8,6 @@
 	"keywords": "keywords",
     "clients": "clients",
 	"orders": "orders",
-    "orderdetails": "orderdetails"
+    "orderdetails": "orderdetails",
+    "sharings": "sharings"
 }

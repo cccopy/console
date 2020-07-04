@@ -38,5 +38,20 @@
 		"title": "關鍵字",
 		"iconClass": "ion ion-md-business",
 		"url": "/keywords/"
+	},
+	{
+		"title": "使用者經驗分享",
+		"iconClass": "ion ion-md-business",
+		"urlbase": "/sharings",
+		"items": [
+			{
+				"title": "列表",
+				"url": "/"
+			},
+			{
+				"title": "新增",
+				"url": "/create"
+			}
+		]
 	}
 ]

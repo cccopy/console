@@ -1,0 +1,32 @@
+{
+	"layout": "grid",
+	"fields": [
+		{
+			"name": "name",
+			"label": "姓名",
+			"link": ":id/update"
+		},
+		{
+			"name": "title",
+			"label": "職稱"
+		},
+		{
+			"name": "photo",
+			"label": "圖片",
+			"type": "file",
+			"layout": "imageview"
+		},
+		{
+			"name": "created_at",
+			"label": "加入時間",
+			"formatFn": "dateFormat"
+		}
+	],
+	"actions": [
+		{
+			"label": "刪除",
+			"url": ":id/ajax/delete",
+			"method": "delete"
+		}
+	]
+}
