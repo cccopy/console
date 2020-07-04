@@ -617,7 +617,11 @@ module.exports = function(app, passport) {
             promises.push(interface.updateOrder(lookid, { status: "已完成" }));
         }
 
-        promises.push(interface.updateOrderDetails(updateDetailList));
+        promises.push(
+            Promise.all(
+                _.map(updateDetailList, dl => interface.updateOrderdetail(dl.id, { status: dl.status })
+            ))
+        );
 
         Promise.all(promises)
             .then(function(){

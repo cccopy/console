@@ -3,7 +3,10 @@ var _ = require('lodash');
 var request = require('request');
 var md5 = require('md5');
 var api = require('../config/constants.json').api;
-var methods = require('../models/methods.config.json');
+const methods = require('../models/methods.config.json');
+
+const pluralize = require('pluralize');
+const capitalize = require('./utils').capitalize;
 
 var axiosIns = axios.create({
 	baseURL: api.base,
@@ -17,7 +20,65 @@ var uploadOptions = {
 	headers: { "Authorization": "Bearer " + api.token }
 };
 
-module.exports = {
+const generatedMethods = (() => {
+	const validKeys = _.filter(methods, (v, k) => k[0] != "_");
+	let res = {};
+	_.each(validKeys, k => {
+		const isPlural = pluralize.isPlural(k);
+		const pluralizeName = isPlural ? k : pluralize(k);
+		const pluralizeCap = capitalize(pluralizeName);
+		const singleName = isPlural ? pluralize.singular(k) : k;
+        const singleCap = capitalize(singleName);
+		// get single
+		res[`get${singleCap}`] = function(condition){
+			let params = { ...condition };
+			return new Promise((resolve, reject) => {
+				axiosIns.get(methods[pluralizeName], { params: params })
+					.then(response => resolve(response.data))
+					.catch(err => reject(err));
+			});
+		};
+		// get plural
+		res[`get${pluralizeCap}`] = function(query){
+			let params = { _limit: -1 };
+			query = query || {};
+			if (typeof query.offset !== "undefined") params._start = query.offset;
+			if (typeof query.limit !== "undefined") params._limit = query.limit;
+			return new Promise((resolve, reject) => {
+				axiosIns.get(methods[pluralizeName], { params: params })
+					.then(response => resolve(response.data))
+					.catch(err => reject(err));
+			});
+		};
+		// create single
+		res[`create${singleCap}`] = function(data){
+			return new Promise((resolve, reject) => {
+				axiosIns.post(methods[pluralizeName], data)
+					.then(response => resolve(response.data))
+					.catch(err => reject(err));
+			});
+		};
+		// update single
+		res[`update${singleCap}`] = function(id, data){
+			return new Promise((resolve, reject) => {
+				axiosIns.put(`${methods[pluralizeName]}/${id}`, data)
+					.then(response => resolve(response.data))
+					.catch(err => reject(err));
+			});	
+		};
+		// remove single
+		res[`remove${singleCap}`] = function(id){
+			return new Promise((resolve, reject) => {
+				axiosIns.delete(`${methods[pluralizeName]}/${id}`)
+					.then(response => resolve())
+					.catch(err => reject(err));
+			});
+		};
+	});
+	return res;
+})();
+
+const additionMethods = {
 	uploadFiles: function(files, path){
 		var postFiles = files.map(function(file){
 			// file.dataurl  "data:image/png;base64,xxxxxx"
@@ -103,17 +164,6 @@ module.exports = {
 				.catch( err => reject(err) );
 		});
 	},
-	getOrders: function(query){
-		var params = { _limit: -1 };
-		query = query || {};
-		if (typeof query.offset !== "undefined") params._start = query.offset;
-		if (typeof query.limit !== "undefined") params._limit = query.limit;
-		return new Promise(function(resolve, reject){
-			axiosIns.get(methods.orders, { params: params })
-				.then( response => resolve(response.data) )
-				.catch( err => reject(err) );
-		});
-	},
 	getOrderWithDetails: function(condition){
 		var params = {};
 		if (typeof condition.id !== "undefined") params.id = condition.id;
@@ -122,100 +172,7 @@ module.exports = {
 				.then(function(response){ resolve(response.data); })
 				.catch( err => reject(err) );
 		});
-	},
-	getClients: function(query){
-		var params = { _limit: -1 };
-		query = query || {};
-		if (typeof query.offset !== "undefined") params._start = query.offset;
-		if (typeof query.limit !== "undefined") params._limit = query.limit;
-		return new Promise(function(resolve, reject){
-			axiosIns.get(methods.clients, { params: params })
-				.then( response => resolve(response.data) )
-				.catch( err => reject(err) );
-		});
-	},
-	getClient: function(condition){
-		var params = { ...condition };
-		return new Promise(function(resolve, reject){
-			axiosIns.get(methods.clients, { params: params })
-				.then(function(response){ resolve(response.data); })
-				.catch( err => reject(err) );
-		});
-	},
-	createClient: function(data){
-		return new Promise(function(resolve, reject){
-			axiosIns.post(methods.clients, data)
-				.then(function(response){ resolve(response.data); })
-				.catch( err => reject(err) );
-		});
-	},
-	updateOrder: function(id, data){
-		return new Promise(function(resolve, reject){
-			axiosIns.put(methods.orders + "/" + id, data)
-				.then(function(response){ resolve(response.data); })
-				.catch( err => reject(err) );
-		});	
-	},
-	updateOrderDetails: function(detailList){
-		return Promise.all(_.map(detailList, dl => {
-			return axiosIns.put(methods.orderdetails + "/" + dl.id, { status: dl.status });
-		}));
-	},
-	getItem: function(condition){
-		var params = {};
-		if (typeof condition.id !== "undefined") params.id = condition.id;
-		return new Promise(function(resolve, reject){
-			axiosIns.get(methods.items, { params: params })
-				.then(function(response){ resolve(response.data); })
-				.catch( err => reject(err) );
-		});
-	},
-	createItem: function(data){
-		return new Promise(function(resolve, reject){
-			axiosIns.post(methods.items, data)
-				.then(function(response){ resolve(response.data); })
-				.catch( err => reject(err) );
-		});
-	},
-	updateItem: function(id, data){
-		return new Promise(function(resolve, reject){
-			axiosIns.put(methods.items + "/" + id, data)
-				.then(function(response){ resolve(response.data); })
-				.catch( err => reject(err) );
-		});	
-	},
-	getKeywords: function(query){
-		var params = { _limit: -1 };
-		query = query || {};
-		if (typeof query.offset !== "undefined") params._start = query.offset;
-		if (typeof query.limit !== "undefined") params._limit = query.limit;
-		return new Promise(function(resolve, reject){
-			axiosIns.get(methods.keyword, { params: params })
-				.then(function(response){
-					resolve(response.data);
-				})
-				.catch( err => reject(err) );
-		});
-	},
-	createKeyword: function(data){
-		return new Promise(function(resolve, reject){
-			axiosIns.post(methods.keyword, data)
-				.then(function(response){ resolve(response.data); })
-				.catch( err => reject(err) );
-		});
-	},
-	updateKeyword: function(id, data){
-		return new Promise(function(resolve, reject){
-			axiosIns.put(methods.keyword + "/" + id, data)
-				.then(function(response){ resolve(response.data); })
-				.catch( err => reject(err) );
-		});	
-	},
-	removeKeyword: function(id){
-		return new Promise(function(resolve, reject){
-			axiosIns.delete(methods.keyword + "/" + id)
-				.then(function(response){ resolve(); })
-				.catch( err => reject(err) );
-		});		
 	}
-}
+};
+
+module.exports = Object.assign({}, generatedMethods, additionMethods);
