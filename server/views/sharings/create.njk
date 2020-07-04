@@ -1,0 +1,39 @@
+
+{% extends "layout.njk" %}
+
+{% import "macros/container.njk" as container %}
+
+{% block headtitle %}使用者經驗分享 新增{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/assets/vendor/libs/select2/select2.css">
+<link rel="stylesheet" href="/assets/vendor/libs/dragula/dragula.min.css">
+<link rel="stylesheet" href="/assets/css/containers.css">
+<link rel="stylesheet" href="/assets/css/forms.css">
+<link rel="stylesheet" href="/assets/css/create.css">
+{% endblock %}
+
+{% block bodyjs %}
+{{ super() }}
+<script src="/assets/vendor/libs/select2/select2.js"></script>
+<script src="/assets/vendor/libs/dragula/dragula.min.js"></script>
+<script src="/assets/js/containers.js"></script>
+<script src="/assets/js/forms.js"></script>
+<script src="/assets/js/create.js"></script>
+{% endblock %}  
+
+{% block innerContent %}
+<h4 class="font-weight-bold py-3 mb-4">使用者經驗分享新增</h4>
+<form method="POST" container-form layout="{{ layouts.layout }}">
+    {% if layouts.layout == 'form' %}
+    {{ container.form(layouts.fields, data) }}
+    {% endif %}
+    <div class="text-right mt-3">
+        <button type="button" class="btn btn-primary" container-save status="normal">
+            <span status-normal>儲存</span>
+            <span status-loading class="spinner-border" role="status" aria-hidden="true"></span>
+            <span status-loading>處理中...</span>
+        </button>
+    </div>
+</form>
+{% endblock %}

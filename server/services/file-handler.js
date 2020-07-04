@@ -9,8 +9,8 @@ class FileHandler {
 		this._removes = [];
 		this._path = path || "";
 	}
-	add(target, key) {
-		this._adds.push( { with: key, data: target } );
+	add(target, key, type) {
+		this._adds.push( { with: key, data: target, type: type || "json" } );
 		return this;
 	}
 	remove(target, key) {
@@ -35,13 +35,17 @@ class FileHandler {
 				.then( results => {
 					let res = results.map((result, idx) => {
 						let o = self._adds[idx];
-						o.data[o.with] = {
-							id: result.id,
-							name: result.name,
-							mime: result.mime,
-							size: result.size,
-							url: convertS3Url(result.url)
-						};
+						if (o.type == "json") {
+							o.data[o.with] = {
+								id: result.id,
+								name: result.name,
+								mime: result.mime,
+								size: result.size,
+								url: convertS3Url(result.url)
+							};
+						} else if (o.type == "file") {
+							o.data[o.with] = result.id;
+						}
 						return o;
 					});
 					// reset

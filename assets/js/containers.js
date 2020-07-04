@@ -7,6 +7,15 @@ function loadFile(file, img){
 	reader.readAsDataURL(file);
 }
 
+function imageFileHandler(){
+	var self = this;
+	var img = $(self).siblings("img").get(0);
+	if (self.files && self.files[0]) {
+		loadFile(self.files[0], img);
+		self._filename = self.files[0].name;
+	}
+}
+
 function rearrangeIndex(container){
 	var startIdx = container._startIdx || 0;
 	var namePrefix = container._namePrefix;
@@ -55,14 +64,7 @@ $(function(){
 			$curTrEl.remove();
 		});
 
-		$(trEl).find("label[image-field] input[type=file]").on('change', function(){
-			var self = this;
-			var img = $(self).siblings("img").get(0);
-			if (self.files && self.files[0]) {
-				loadFile(self.files[0], img);
-				self._filename = self.files[0].name;
-			}
-		});
+		$(trEl).find("label[image-field] input[type=file]").on('change', imageFileHandler);
 
 		$(trEl).find("[name]").each(function(nidx, nel){
 			nel._originName = $(nel).attr("name");

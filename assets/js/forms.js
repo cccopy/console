@@ -1,4 +1,20 @@
 
+function loadFile(file, img){
+	var reader = new FileReader();
+	reader.onload = function(){
+		img.src = reader.result;
+	};
+	reader.readAsDataURL(file);
+}
+
+function imageFileHandler(){
+	var self = this;
+	var img = $(self).siblings("img").get(0);
+	if (self.files && self.files[0]) {
+		loadFile(self.files[0], img);
+		self._filename = self.files[0].name;
+	}
+}
 // Select2
 $(function() {
 	var blockSubmit = false;
@@ -51,4 +67,6 @@ $(function() {
 			}
 		});
 	});
+
+	$("[layout=form] label[image-field] input[type=file]").on('change', imageFileHandler);
 });

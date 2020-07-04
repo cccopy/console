@@ -67,7 +67,11 @@
 {% macro parseFormField(field, data={}) %}
 <div class="form-group row">
 	<label class="col-form-label col-sm-2 text-sm-right">{{ field.label }}</label>
-	<div class="col-sm-10">
+	{% set sizenumber = '10' %}
+	{% if field.size == 'small' %}
+		{% set sizenumber = '3' %}
+	{% endif %}
+	<div class="col-sm-{{sizenumber}}">
 		{{ parseField(field, data) }}
 	</div>
 </div>

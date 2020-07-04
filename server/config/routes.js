@@ -20,6 +20,7 @@ var widgets = require('../models/widgets.config.json');
 
 var items_createLayout = require('../models/items/create.config.json');
 var clients_createLayout = require('../models/clients/create.config.json');
+var sharings_createLayout = require('../models/sharings/create.config.json');
 
 const detailStatusOptions = [
     "等待審核素材",
@@ -250,7 +251,8 @@ module.exports = function(app, passport) {
                 if ( action == "_list" ) {
                     return async function(req, res, next) {
                         const fields = collectFields(layout);
-                        let transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+                        const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+                        const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
                         let query = {};
                         if(!_.isEmpty(layout.filters)) query._filters = layout.filters;
                         interface["get" + utils.capitalize(model)](query)
@@ -280,6 +282,10 @@ module.exports = function(app, passport) {
                                             return _.isEmpty(newData) ? data : newData;
                                         });
                                         result[fd.name] = mutableList;
+                                    });
+                                    _.each(fileFields, fd => {
+                                        let val = result[fd.name];
+                                        result[fd.name].url = utils.convertS3Url(val.url);
                                     });
                                 });
                                 res.render(path, {
@@ -389,6 +395,26 @@ module.exports = function(app, passport) {
         mergeCollectionRelateds(fields, mutableData)
             .then(function(){ return interface.createClient(mutableData) })
             .then(function(result){ res.redirect('/clients/'); })
+            .catch(function(err){ console.log(err) });
+    });
+
+    app.post('/sharings/create', loginRequired, function(req, res){
+        const fields = collectFields(sharings_createLayout);
+        const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
+        let fileHandler = new FileHandler("sharings");
+        let mutableData = _.cloneDeep(req.body);
+
+        _.each(fileFields, fd => {
+            var val = mutableData[fd.name];
+            if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
+                fileHandler.add(mutableData, fd.name, "file");
+            }
+        });
+
+        mergeCollectionRelateds(fields, mutableData)
+            .then( () => { return fileHandler.exec() })
+            .then(function(){ return interface.createSharing(mutableData) })
+            .then(function(result){ res.redirect('/sharings/'); })
             .catch(function(err){ console.log(err) });
     });
 

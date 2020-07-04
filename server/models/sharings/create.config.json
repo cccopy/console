@@ -1,0 +1,28 @@
+{
+    "layout": "form",
+    "fields": [
+        {
+            "name": "name",
+            "label": "姓名",
+            "required": true,
+            "type": "string"
+        },
+        {
+            "name": "title",
+            "label": "職稱",
+            "type": "string"
+        },
+        {
+            "name": "content",
+            "label": "內容",
+            "required": true,
+            "type": "text"
+        },
+        {
+            "name": "photo",
+            "label": "圖片",
+            "type": "image-file",
+            "size": "small"
+        }
+    ]
+}
