@@ -66,6 +66,10 @@ exports.base64_encode = function(file){
     return new Buffer(bitmap).toString('base64');
 };
 
+exports.capitalize = function(str){
+	return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
 exports.isDataURL = isDataURL;
 
 exports.convertS3Url = function(s3url){

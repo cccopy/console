@@ -20,7 +20,6 @@ var widgets = require('../models/widgets.config.json');
 
 var items_createLayout = require('../models/items/create.config.json');
 var clients_createLayout = require('../models/clients/create.config.json');
-var keywords_listLayout = require('../models/keywords/_list.config.json');
 
 const detailStatusOptions = [
     "等待審核素材",
@@ -65,9 +64,6 @@ function getYoutubeThumbnail(url){
     return "";
 }
 
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
 function collectFields(layouts){
     if (layouts.layout == "tabs") {
         return layouts.sections
@@ -92,7 +88,7 @@ function getRelatedData(fields){
     });
 
     let relatedPromises = relatedFields.map( fd => {
-        return interface["get" + capitalize(pluralize(fd.related))]()
+        return interface["get" + utils.capitalize(pluralize(fd.related))]()
             .then( results => {
                 let nextData = {};
                 nextData[fd.related] = results;
@@ -134,7 +130,7 @@ function mergeCollectionRelateds(fields, mutableData){
                 if ( converted == 0 ) {
                     let toCreate = {};
                     toCreate[fd.valueOnCreate] = val;
-                    return interface["create" + capitalize(fd.related)](toCreate)
+                    return interface["create" + utils.capitalize(fd.related)](toCreate)
                         .then( result => {
                             if (typeof result == "object") return result.id;
                             else if (Array.isArray(result)) return result[0].id;
@@ -245,7 +241,7 @@ module.exports = function(app, passport) {
     _.each(layoutNamespace, (actions, modelName) => {
         _.each(actions, (layouts, actionName) => {
             const singleName = pluralize.singular(modelName);
-            const singleCap = capitalize(singleName);
+            const singleCap = utils.capitalize(singleName);
             let currentPath = [modelName, actionName].join('/'),
                 renderPath = currentPath,
                 isList = actionName == "_list";
@@ -257,7 +253,7 @@ module.exports = function(app, passport) {
                         let transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
                         let query = {};
                         if(!_.isEmpty(layout.filters)) query._filters = layout.filters;
-                        interface["get" + capitalize(model)](query)
+                        interface["get" + utils.capitalize(model)](query)
                             .then(function(results){
                                 // do decode here
                                 let mutableData = results;
