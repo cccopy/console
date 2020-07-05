@@ -10,7 +10,7 @@ class FileHandler {
 		this._path = path || "";
 	}
 	add(target, key, type) {
-		this._adds.push( { with: key, data: target, type: type || "json" } );
+		this._adds.push( { with: key, data: target } );
 		return this;
 	}
 	remove(target, key) {
@@ -35,17 +35,13 @@ class FileHandler {
 				.then( results => {
 					let res = results.map((result, idx) => {
 						let o = self._adds[idx];
-						if (o.type == "json") {
-							o.data[o.with] = {
-								id: result.id,
-								name: result.name,
-								mime: result.mime,
-								size: result.size,
-								url: convertS3Url(result.url)
-							};
-						} else if (o.type == "file") {
-							o.data[o.with] = result.id;
-						}
+						o.data[o.with] = {
+							id: result.id,
+							name: result.name,
+							mime: result.mime,
+							size: result.size,
+							url: convertS3Url(result.url)
+						};
 						return o;
 					});
 					// reset

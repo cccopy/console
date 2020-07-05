@@ -285,7 +285,7 @@ module.exports = function(app, passport) {
                                     });
                                     _.each(fileFields, fd => {
                                         let val = result[fd.name];
-                                        result[fd.name].url = utils.convertS3Url(val.url);
+                                        if (!val || !val.url) result[fd.name].url = "";
                                     });
                                 });
                                 res.render(path, {
@@ -537,6 +537,30 @@ module.exports = function(app, passport) {
             .catch(next);
     });
 
+    app.get('/sharings/:id/update', loginRequired, function(req, res, next){
+        const lookid = req.params.id;
+        const fields = collectFields(sharings_createLayout);
+        const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
+
+        interface.getSharing({ id: lookid })
+            .then(results => {
+                if ( results && results.length ){
+                    let mutableData = results[0];
+
+                    _.each(fileFields, fd => {
+                        let val = mutableData[fd.name];
+                        mutableData[fd.name] = (val && val.url) ? val.url : "";
+                    });
+
+                    res.render('sharings/_id/update', { 
+                        layouts: sharings_createLayout,
+                        data: mutableData
+                    } );
+                } else notFound(res);
+            })
+            .catch(next);
+    });
+
     app.put('/items/:id/update', loginRequired, function(req, res, next){
         const lookid = req.params.id;
         const fields = collectFields(items_createLayout);
@@ -656,8 +680,44 @@ module.exports = function(app, passport) {
             .catch(next);
     });
 
+    app.put('/sharings/:id/update', loginRequired, function(req, res, next){
+        const lookid = req.params.id;
+        const fields = collectFields(sharings_createLayout);
+        const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
+        let fileHandler = new FileHandler("sharings");
+        let mutableData = _.cloneDeep(req.body);
+        let hasUploadNames = [];
 
+        _.each(fileFields, fd => {
+            var val = mutableData[fd.name];
+            if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
+                fileHandler.add(mutableData, fd.name);
+                hasUploadNames.push(fd.name);
+            }
+        });
 
+        let promiseChain = mergeCollectionRelateds(fields, mutableData);
+
+        if (hasUploadNames.length) {
+            promiseChain = promiseChain
+                .then(() => interface.getSharing({ id: lookid }))
+                .then(results => {
+                    if ( results && results.length ){
+                        const oldData = results[0];
+                        _.each(hasUploadNames, name => {
+                            const val = oldData[name];
+                            if (val && val.id) fileHandler.remove(oldData, name);
+                        });
+                    }
+                })
+                .then(() => fileHandler.exec());
+        }
+
+        promiseChain
+            .then(() => interface.updateSharing(lookid, mutableData))
+            .then(() => res.redirect('/sharings/'))
+            .catch(next);
+    });
 
     // =====================================
     // Authentication ======================

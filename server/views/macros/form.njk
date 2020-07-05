@@ -63,6 +63,7 @@
 {% endmacro %}
 
 {% macro imageview(src, link, icon='') %}
+{% if src|length %}
 <a href="{{ link }}" class="d-block align-items-center ui-w-100 position-relative mr-2 mb-1">
 	{% if icon|length %}
 		{% set iconcls = 'image' %}
@@ -73,6 +74,7 @@
 	{% endif %}
 	<img src="{{ src }}" alt="" class="img-fluid">
 </a>
+{% endif %}
 {% endmacro %}
 
 {% macro imagelistview(datalist=[]) %}
