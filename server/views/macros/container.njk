@@ -215,7 +215,8 @@
 				{% set didx = loop.index0 %}
 				{{ forms.hiddenfield('_order', value=didx) }}
 				{% for field in fields %}
-				{% set htmlcontent = '<' + field.htmlwrap + ' class="' + field.htmlclass + '">' + ddata[field.name] + '</' + field.htmlwrap + '>'%}
+				{% set formatVal = ddata[field.name] | useFormatString(field.showFormat) %}
+				{% set htmlcontent = '<' + field.htmlwrap + ' class="' + field.htmlclass + '">' + formatVal + '</' + field.htmlwrap + '>'%}
 				{{ htmlcontent | safe }}
 				{% endfor %}
 			</div>
@@ -235,7 +236,7 @@
 	</div>
 </template>
 {% for field in fields %}
-<template type="{{ field.name }}">
+<template type="{{ field.name }}" show-format="{{ field.showFormat }}">
 	{% set htmlcontent = '<' + field.htmlwrap + ' class="' + field.htmlclass + '" text-label></' + field.htmlwrap + '>' %}
 	{{ htmlcontent | safe }}
 	{{ forms.hiddenfield(field.name, prop='text-content') }}

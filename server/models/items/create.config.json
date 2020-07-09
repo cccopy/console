@@ -43,7 +43,12 @@
 					"name": "strategy",
 					"label": "影片策略",
 					"type": "text"
-				}, 
+				},
+				{
+					"name": "produceTeam",
+					"label": "製作團隊",
+					"type": "string"
+				},
 				{
 					"name": "context",
 					"label": "適用情境",
@@ -75,6 +80,7 @@
 					"name": "delivery",
 					"type": "string",
 					"label": "交付項目",
+					"tip": "你將會得到...",
 					"required": true
 				},
 				{
@@ -208,7 +214,38 @@
 							"label": "資料型別",
 							"emptylabel": " -- 請選擇型別 -- ",
 							"htmlwrap": "p",
-							"htmlclass": "text-muted m-0"
+							"htmlclass": "text-muted m-0",
+							"showFormat": "型別：%v"
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "製作流程",
+			"id": "tab-produce-flow",
+			"fields": [
+				{
+					"name": "produceFlow",
+					"label": "製作流程",
+					"type": "json",
+					"required": true,
+					"layout": "field-sort-list",
+					"fields": [
+						{
+							"name": "title",
+							"type": "string",
+							"label": "流程步驟",
+							"htmlwrap": "label",
+							"htmlclass": "form-label"
+						},
+						{
+							"name": "days",
+							"type": "string",
+							"label": "處理天數",
+							"htmlwrap": "p",
+							"htmlclass": "text-muted m-0",
+							"showFormat": "需 %v 天"
 						}
 					]
 				}

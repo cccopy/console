@@ -266,15 +266,21 @@ $(function(){
 
 				var mapName = $inputSelf.parent().attr("map-name");
 
-				var tplInnerContent = $self.siblings("template[type='" + mapName + "']").get(0).content;
+				var tplInner = $self.siblings("template[type='" + mapName + "']").get(0),
+					tplInnerShowFormat = $(tplInner).attr("show-format"),
+					tplInnerContent = tplInner.content;
 
 				newAnchor.append( document.importNode(tplInnerContent, true) )
 
 				var tagname = $inputSelf[0].tagName.toLowerCase();
 				if ( tagname == "input" ) {
-					newAnchor.find('[text-label]').last().text($inputSelf.val());
+					var val = $inputSelf.val();
+					if (tplInnerShowFormat) val = tplInnerShowFormat.replace("%v", val);
+					newAnchor.find('[text-label]').last().text(val);
 				} else if ( tagname == "select" ) {
-					newAnchor.find('[text-label]').last().text($inputSelf.find(":selected").text());
+					var val = $inputSelf.find(":selected").text();
+					if (tplInnerShowFormat) val = tplInnerShowFormat.replace("%v", val);
+					newAnchor.find('[text-label]').last().text(val);
 				}
 				newAnchor.find('[text-content]').last().val($inputSelf.val());
 
