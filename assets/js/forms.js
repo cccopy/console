@@ -40,9 +40,30 @@ $(function() {
 		var $self = $(this);
 		var $jqForm = $self.closest("form");
 		var formEl = $jqForm.length ? $jqForm.get(0) : null;
-		if (!blockSubmit && formEl && formEl.reportValidity()) {
-			$self.attr("status", "loading").prop("disabled", true);
-			$jqForm.submit();
+		var layout = $jqForm.attr("layout");
+		var shouldWait = false;
+		var submitFn = function(){
+			if (formEl.reportValidity()) {
+				$self.attr("status", "loading").prop("disabled", true);
+				$jqForm.submit();
+			}
+		};
+		if (!blockSubmit && formEl){
+			if (layout == "tabs") {
+				var inputs = formEl.elements;
+				for (var i = 0, len = inputs.length; i < len; i++) {
+					if (inputs[i].validity.valid === false) {
+						var tabpane = inputs[i].closest("div.tab-pane");
+						if (!$(tabpane).hasClass("active")){
+							shouldWait = true;
+							$("ul.nav-tabs a[href='#" + tabpane.id + "'").click();
+						}
+						break;
+					}
+				}
+			}
+			if (shouldWait) setTimeout(submitFn, 300);
+			else submitFn();
 		}
 	});
 
