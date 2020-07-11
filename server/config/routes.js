@@ -335,91 +335,66 @@ module.exports = function(app, passport) {
                         .then(function(){ sendOk(res) })
                         .catch(next);
                 });
-            }
-        });
-    });
+            } else if (actionName == "create") {
+                app.post(`/${modelName}/create`, loginRequired, function(req, res){
+                    const fields = collectFields(layouts);
+                    const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
+                    const secreteFields = _.filter(fields, function(fd){ return fd.type == "password" });
+                    const booleanFields = _.filter(fields, function(fd){ return fd.type == "boolean" });
+                    const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
+                    let mutableData = _.cloneDeep(req.body);
+                    let fileHandler = new FileHandler(modelName);
 
-    app.post('/items/create', loginRequired, function(req, res){
-        const fields = collectFields(items_createLayout);
-        const transferFields = _.filter(fields, function(fd){ return fd.type == "json" });
-        let mutableData = _.cloneDeep(req.body);
-        let shouldUploads = [];
-        let fileHandler = new FileHandler("items");
-
-        _.each(transferFields, fd => {
-            let targetVal = mutableData[fd.name];
-            if ( Array.isArray(targetVal) ) {
-                // find the files fields
-                let fileNames = _.map(
-                    _.filter(fd.fields, inf => { 
-                        return inf.type == "image-file" || inf.type == "file";
-                    }),
-                    o => o.name
-                );
-                // find file field in json and collect them
-                _.each(fileNames, name => {
-                    _.each(mutableData[fd.name], tuple => {
-                        const val = tuple[name];
-                        if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
-                            fileHandler.add(tuple, name);
+                    _.each(transferFields, fd => {
+                        let targetVal = mutableData[fd.name];
+                        if ( Array.isArray(targetVal) ) {
+                            // find the files fields
+                            let fileNames = _.map(
+                                _.filter(fd.fields, inf => { 
+                                    return inf.type == "image-file" || inf.type == "file";
+                                }),
+                                o => o.name
+                            );
+                            // find file field in json and collect them
+                            _.each(fileNames, name => {
+                                _.each(mutableData[fd.name], tuple => {
+                                    const val = tuple[name];
+                                    if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
+                                        fileHandler.add(tuple, name);
+                                    }
+                                })
+                            });
+                        } else if (typeof targetVal == "undefined" || targetVal == "") {
+                            // defaults
+                            mutableData[fd.name] = {};
                         }
-                    })
+                    });
+
+                    _.each(secreteFields, fd => {
+                        let targetVal = mutableData[fd.name];
+                        mutableData[fd.name] = md5(targetVal);
+                    });
+
+                    _.each(booleanFields, fd => {
+                        let targetVal = mutableData[fd.name];
+                        mutableData[fd.name] = utils.parseBoolean(targetVal, fd.defaultValue);
+                    });
+
+                    _.each(fileFields, fd => {
+                        var val = mutableData[fd.name];
+                        if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
+                            fileHandler.add(mutableData, fd.name, "file");
+                        }
+                    });
+
+                    mergeCollectionRelateds(fields, mutableData)
+                        .then(() => fileHandler.exec())
+                        .then(() => interface[`create${singleCap}`](mutableData))
+                        .then(() => res.redirect(`/${modelName}/`))
+                        .catch(function(err){ console.log(err) });
                 });
-            } else if (typeof targetVal == "undefined" || targetVal == "") {
-                // defaults
-                mutableData[fd.name] = {};
             }
         });
-
-        // fields, mutableData
-        mergeCollectionRelateds(fields, mutableData)
-            .then( () => { return fileHandler.exec() })
-            .then(function(){ return interface.createItem(mutableData) })
-            .then(function(result){ res.redirect('/items/'); })
-            .catch(function(err){ console.log(err) });
-    });
-
-    app.post('/clients/create', loginRequired, function(req, res){
-        const fields = collectFields(clients_createLayout);
-        const secreteFields = _.filter(fields, function(fd){ return fd.type == "password" });
-        const booleanFields = _.filter(fields, function(fd){ return fd.type == "boolean" });
-        let mutableData = _.cloneDeep(req.body);
-
-        _.each(secreteFields, fd => {
-            let targetVal = mutableData[fd.name];
-            mutableData[fd.name] = md5(targetVal);
-        });
-
-        _.each(booleanFields, fd => {
-            let targetVal = mutableData[fd.name];
-            mutableData[fd.name] = utils.parseBoolean(targetVal, fd.defaultValue);
-        });
-
-        // fields, mutableData
-        mergeCollectionRelateds(fields, mutableData)
-            .then(function(){ return interface.createClient(mutableData) })
-            .then(function(result){ res.redirect('/clients/'); })
-            .catch(function(err){ console.log(err) });
-    });
-
-    app.post('/sharings/create', loginRequired, function(req, res){
-        const fields = collectFields(sharings_createLayout);
-        const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
-        let fileHandler = new FileHandler("sharings");
-        let mutableData = _.cloneDeep(req.body);
-
-        _.each(fileFields, fd => {
-            var val = mutableData[fd.name];
-            if ( typeof val == 'object' && utils.isDataURL(val.dataurl) ) {
-                fileHandler.add(mutableData, fd.name, "file");
-            }
-        });
-
-        mergeCollectionRelateds(fields, mutableData)
-            .then( () => { return fileHandler.exec() })
-            .then(function(){ return interface.createSharing(mutableData) })
-            .then(function(result){ res.redirect('/sharings/'); })
-            .catch(function(err){ console.log(err) });
     });
 
     app.get('/clients/:id/detail', loginRequired, function(req, res, next){
