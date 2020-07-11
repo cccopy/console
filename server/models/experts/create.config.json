@@ -13,5 +13,15 @@
             "type": "image-file",
             "size": "small"
         }
+    ],
+    "otherRoutes": [
+        {
+            "method": "get",
+            "path": ":id/update"
+        },
+        {
+            "method": "put",
+            "path": ":id/update"
+        }
     ]
 }

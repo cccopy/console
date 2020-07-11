@@ -11,7 +11,10 @@ const capitalize = require('./utils').capitalize;
 var axiosIns = axios.create({
 	baseURL: api.base,
 	timeout: api.timeout,
-	headers: { "Authorization": "Bearer " + api.token }
+	headers: { 
+		"Authorization": "Bearer " + api.token,
+		"Content-Type": "application/json; charset=UTF-8"
+	}
 });
 
 var uploadOptions = {
