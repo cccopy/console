@@ -1,0 +1,23 @@
+{
+	"layout": "grid",
+	"fields": [
+		{
+			"name": "name",
+			"label": "名稱",
+			"link": ":id/update"
+		},
+		{
+			"name": "image",
+			"label": "圖片",
+			"type": "file",
+			"layout": "imageview"
+		}
+	],
+	"actions": [
+		{
+			"label": "刪除",
+			"url": ":id/ajax/delete",
+			"method": "delete"
+		}
+	]
+}

@@ -1,0 +1,17 @@
+{
+    "layout": "form",
+    "fields": [
+        {
+            "name": "name",
+            "label": "名稱",
+            "required": true,
+            "type": "string"
+        },
+        {
+            "name": "image",
+            "label": "圖片",
+            "type": "image-file",
+            "size": "small"
+        }
+    ]
+}

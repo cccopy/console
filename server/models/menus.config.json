@@ -40,6 +40,21 @@
 		"url": "/keywords/"
 	},
 	{
+		"title": "職人角色",
+		"iconClass": "ion ion-md-business",
+		"urlbase": "/experts",
+		"items": [
+			{
+				"title": "列表",
+				"url": "/"
+			},
+			{
+				"title": "新增",
+				"url": "/create"
+			}
+		]
+	},
+	{
 		"title": "使用者經驗分享",
 		"iconClass": "ion ion-md-business",
 		"urlbase": "/sharings",
