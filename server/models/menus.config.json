@@ -75,6 +75,10 @@
 		"urlbase": "/photos",
 		"items": [
 			{
+				"title": "相簿瀏覽",
+				"url": "/"
+			},
+			{
 				"title": "新增圖片",
 				"url": "/create"
 			},

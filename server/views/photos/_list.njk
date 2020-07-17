@@ -1,0 +1,32 @@
+
+{% extends "layout.njk" %}
+
+{% import "macros/container.njk" as container %}
+
+{% block headtitle %}相簿瀏覽{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/assets/css/containers.css">
+<link rel="stylesheet" href="/assets/vendor/libs/datatables/datatables.css">
+<link rel="stylesheet" href="/assets/vendor/libs/blueimp-gallery/gallery.css">
+<link rel="stylesheet" href="/assets/vendor/libs/blueimp-gallery/gallery-indicator.css">
+{% endblock %}
+
+{% block bodyjs %}
+{{ super() }}
+<script src="/assets/vendor/libs/datatables/datatables.js"></script>
+<script src="/assets/vendor/libs/blueimp-gallery/gallery.js"></script>
+<script src="/assets/vendor/libs/blueimp-gallery/gallery-fullscreen.js"></script>
+<script src="/assets/vendor/libs/blueimp-gallery/gallery-indicator.js"></script>
+<script src="/assets/vendor/libs/masonry/masonry.js"></script>
+<script src="/assets/js/containers.js"></script>
+{% endblock %}	
+
+{% block innerContent %}
+<h4 class="font-weight-bold py-3 mb-4">相簿瀏覽</h4>
+{% if layouts.layout == 'gallery' %}
+{{ container.galleryview(layouts.fields, data, layouts) }}
+{% endif %}
+{% endblock %}
+
+

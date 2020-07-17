@@ -292,6 +292,67 @@
 </div>
 {% endmacro %}
 
+{% macro galleryview(fields, datalist=[], layouts={}) %}
+{% set imagefield = '' %}
+{% set tagfield = '' %}
+{% for field in fields %}
+	{% if field.isImage %}
+		{% set imagefield = field.name %}
+	{% endif %}
+	{% if field.isTag %}
+		{% set tagfield = field.name %}
+	{% endif %}
+{% endfor %}
+<ul id="gallery-filter" class="nav nav-tabs tabs-alt mb-4">
+	<li class="nav-item">
+		<a class="nav-link active" href="#all">All</a>
+	</li>
+	<!-- <li class="nav-item">
+		<a class="nav-link" href="#nature">Nature</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="#car">Cars</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="#animal">Animal</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="#other">Other</a>
+	</li> -->
+</ul>
+<!-- Lightbox template -->
+<div id="gallery-lightbox" class="blueimp-gallery blueimp-gallery-controls">
+	<div class="slides"></div>
+	<h3 class="title"></h3>
+	<a class="prev">‹</a>
+	<a class="next">›</a>
+	<a class="close">×</a>
+	<a class="play-pause"></a>
+	<ol class="indicator"></ol>
+</div>
+<div id="gallery-thumbnails" class="row form-row">
+	<!-- Add this element to properly relayout grid -->
+	<div class="gallery-sizer col-sm-6 col-md-6 col-xl-3 position-absolute"></div>
+
+	{% for data in datalist %}
+		{% set tag = '' %}
+		{% set image = data[imagefield] %}
+		{% if data[tagfield]|length %}
+			{% set tag = data[tagfield] %}
+		{% endif %}
+		<div class="gallery-thumbnail col-sm-6 col-md-6 col-xl-3 mb-2" data-tag="{{ tag }}">
+			<a href="{{ image.url }}" class="img-thumbnail img-thumbnail-zoom-in">
+				<span class="img-thumbnail-overlay bg-dark opacity-25"></span>
+				<span class="img-thumbnail-content display-4 text-white">
+					<i class="ion ion-ios-search"></i>
+				</span>
+				<img src="{{ image.url }}" class="img-fluid">
+			</a>
+		</div>
+	{% endfor %}
+</div>
+{% endmacro %}
+
 {% macro form(fields, data={}) %}
 <div class="card">
 	<div class="card-body">

@@ -1,0 +1,27 @@
+{
+	"layout": "gallery",
+	"fields": [
+		{
+			"name": "image",
+			"label": "圖片",
+			"type": "image-file",
+			"isImage": true
+		},
+		{
+			"name": "tag",
+			"label": "標籤",
+			"isTag": true
+		},
+		{
+			"name": "description",
+			"label": "圖片說明"
+		}
+	],
+	"actions": [
+		{
+			"label": "刪除",
+			"url": ":id/ajax/delete",
+			"method": "delete"
+		}
+	]
+}
