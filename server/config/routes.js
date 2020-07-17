@@ -21,6 +21,7 @@ var widgets = require('../models/widgets.config.json');
 var items_createLayout = require('../models/items/create.config.json');
 var clients_createLayout = require('../models/clients/create.config.json');
 var sharings_createLayout = require('../models/sharings/create.config.json');
+var photos_createLayout = require('../models/photos/create.config.json');
 
 const detailStatusOptions = [
     "等待審核素材",
@@ -470,6 +471,49 @@ module.exports = function(app, passport) {
                 }
             });
         });
+    });
+
+    app.get('/photos/batchcreate', loginRequired, function(req, res){
+        res.render('photos/batchcreate');
+    });
+
+    app.post('/photos/ajax/batchcreate', loginRequired, function(req, res, next){
+        const fields = collectFields(photos_createLayout);
+        const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
+        let mutableData = {};
+
+        if (fileFields.length) {
+            let fileType = req.header("Content-Type"),
+                fileName = req.query['flowFilename'],
+                fieldName = fileFields[0].name;
+                data = [];
+
+            req.on('error', err => {
+                console.error(err);
+                badRequest(res);
+            })
+            .on('data', function(binData){
+                data.push(binData);
+            })
+            .on('end', function(){
+                var buffer = Buffer.concat(data);
+
+                mutableData[fieldName] = {
+                    name: fileName,
+                    dataurl: `data:${fileType};base64,${buffer.toString('base64')}`
+                };
+                
+                // to upload
+                const fileHandler = new FileHandler("photos");
+
+                fileHandler.add(mutableData, fieldName);
+                
+                fileHandler.exec()
+                    .then(() => interface.createPhoto(mutableData))
+                    .then(() => res.send("OK"))
+                    .catch(next);
+            });
+        }
     });
 
     app.get('/clients/:id/detail', loginRequired, function(req, res, next){

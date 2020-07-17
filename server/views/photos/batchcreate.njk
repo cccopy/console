@@ -1,0 +1,63 @@
+
+{% extends "layout.njk" %}
+
+{% import "macros/container.njk" as container %}
+
+{% block headtitle %}圖庫 批次新增圖片{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/assets/vendor/libs/dropzone/dropzone.css">
+<link rel="stylesheet" href="/assets/vendor/libs/flow-js/flow.css">
+<link rel="stylesheet" href="/assets/css/containers.css">
+<link rel="stylesheet" href="/assets/css/forms.css">
+<link rel="stylesheet" href="/assets/css/create.css">
+{% endblock %}
+
+{% block bodyjs %}
+{{ super() }}
+<script src="/assets/vendor/libs/dropzone/dropzone.js"></script>
+<script src="/assets/vendor/libs/flow-js/flow.js"></script>
+<script src="/assets/js/containers.js"></script>
+<script src="/assets/js/forms.js"></script>
+<!-- <script src="/assets/js/create.js"></script> -->
+<script src="/assets/js/batchcreate.js"></script>
+{% endblock %}  
+
+{% block innerContent %}
+<h4 class="font-weight-bold py-3 mb-4">圖庫 批次新增圖片</h4>
+<div class="card">
+    <div class="card-body">
+        <div class="flow-error alert alert-danger">
+            Your browser, unfortunately, is not supported by Flow.js. The library requires support for
+            <a href="http://www.w3.org/TR/FileAPI/">the HTML5 File API</a> along with
+            <a href="http://www.w3.org/TR/FileAPI/#normalization-of-params">file slicing</a>.
+        </div>
+
+        <div class="flow-drop py-5 px-3" ondragenter="$(this).addClass('flow-dragover')" ondragend="$(this).removeClass('flow-dragover')" ondrop="$(this).removeClass('flow-dragover')">
+            <h4>Drop files here to upload or</h4>
+            <button type="button" class="flow-browse-image btn btn-secondary">Select images</button>
+        </div>
+
+        <div class="flow-progress media d-none mt-4">
+            <div class="mr-3">
+                <button type="button" onclick="r.upload(); return(false);" class="progress-resume-link btn icon-btn btn-primary">
+                    <i class="ion ion-md-play"></i>
+                </button>
+                <button type="button" onclick="r.pause(); return(false);" class="progress-pause-link btn icon-btn btn-warning">
+                    <i class="ion ion-md-pause"></i>
+                </button>
+                <button type="button" onclick="r.cancel(); return(false);" class="progress-cancel-link btn icon-btn btn-danger">
+                    <i class="ion ion-md-close"></i>
+                </button>
+            </div>
+            <div class="media-body align-self-center">
+                <div class="progress-container progress">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="flow-list list-group d-none mt-4"></ul>
+    </div>
+</div>
+{% endblock %}

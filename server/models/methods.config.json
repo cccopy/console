@@ -10,5 +10,6 @@
 	"orders": "orders",
     "orderdetails": "orderdetails",
     "sharings": "sharings",
-    "experts": "experts"
+    "experts": "experts",
+    "photos": "photos"
 }

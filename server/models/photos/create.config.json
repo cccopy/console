@@ -1,0 +1,32 @@
+{
+    "layout": "form",
+    "fields": [
+        {
+            "name": "image",
+            "label": "圖片",
+            "type": "image-file",
+            "required": true,
+            "size": "small"
+        },
+        {
+            "name": "tag",
+            "label": "標籤",
+            "type": "string"
+        },
+        {
+            "name": "description",
+            "label": "圖片說明",
+            "type": "text"
+        }
+    ],
+    "otherRoutes": [
+        {
+            "method": "get",
+            "path": ":id/update"
+        },
+        {
+            "method": "put",
+            "path": ":id/update"
+        }
+    ]
+}

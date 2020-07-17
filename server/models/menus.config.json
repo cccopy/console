@@ -68,5 +68,20 @@
 				"url": "/create"
 			}
 		]
+	},
+	{
+		"title": "圖庫",
+		"iconClass": "ion ion-md-business",
+		"urlbase": "/photos",
+		"items": [
+			{
+				"title": "新增圖片",
+				"url": "/create"
+			},
+			{
+				"title": "批次新增圖片",
+				"url": "/batchcreate"
+			}
+		]
 	}
 ]
