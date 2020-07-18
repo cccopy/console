@@ -403,11 +403,42 @@ $(function(){
 // gallery view
 $(function(){
 
-	$('#gallery-thumbnails').on('click', '.gallery-thumbnail > .img-thumbnail', function(e) {
-		e.preventDefault();
+	var $thumbnails = $('#gallery-thumbnails');
 
+	$thumbnails.on('click', '.gallery-thumbnail i[action-url]', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		var $self = $(this);
+		// console.log("icon click");
+
+		var $wrap = $self.closest(".gallery-thumbnail");
+		var id = $wrap.data("id");
+		var url = $self.attr("action-url");
+		var method = $self.attr("action-method");
+
+		url = url.replace(":id", id);
+
+		var isAjax = url.split("/ajax/").length > 1;
+		if (isAjax) {
+			var ajaxObj = {
+				method: method,
+				url: url
+			};
+
+			Promise.resolve($.ajax(ajaxObj))
+				.then(function(){
+					location.reload(true);
+				});
+		} else {
+			window.location.href = url;
+		}
+	});
+
+	$thumbnails.on('click', '.gallery-thumbnail > .img-thumbnail', function(e) {
+		e.preventDefault();
+		
 		// Select only visible thumbnails
-		var links = $('#gallery-thumbnails').find('.gallery-thumbnail:not(.d-none) > .img-thumbnail');
+		var links = $thumbnails.find('.gallery-thumbnail:not(.d-none) > .img-thumbnail');
 
 		window.blueimpGallery(links, {
 			container: '#gallery-lightbox',
@@ -418,31 +449,33 @@ $(function(){
 		});
 	});
 
-	var msnry = new Masonry('#gallery-thumbnails', {
-		itemSelector: '.gallery-thumbnail:not(.d-none)',
-		columnWidth: '.gallery-sizer',
-		originLeft: !($('body').attr('dir') === 'rtl' || $('html').attr('dir') === 'rtl')
-	});
+	if (window.Masonry) {
+		var msnry = new Masonry('#gallery-thumbnails', {
+			itemSelector: '.gallery-thumbnail:not(.d-none)',
+			columnWidth: '.gallery-sizer',
+			originLeft: !($('body').attr('dir') === 'rtl' || $('html').attr('dir') === 'rtl')
+		});
 
-	$('#gallery-filter').on('click', '.nav-link', function(e) {
-		e.preventDefault();
+		$('#gallery-filter').on('click', '.nav-link', function(e) {
+			e.preventDefault();
 
-		// Set active filter
-		$('#gallery-filter .nav-link').removeClass('active');
-		$(this).addClass('active');
+			// Set active filter
+			$('#gallery-filter .nav-link').removeClass('active');
+			$(this).addClass('active');
 
-		// Show all
-		if (this.getAttribute('href') === '#all') {
-			$('#gallery-thumbnails .gallery-thumbnail').removeClass('d-none');
+			// Show all
+			if (this.getAttribute('href') === '#all') {
+				$thumbnails.find('.gallery-thumbnail').removeClass('d-none');
 
-		// Show thumbnails only with selected tag
-		} else {
-			$('#gallery-thumbnails .gallery-thumbnail:not([data-tag="' + this.getAttribute('href').replace('#', '') + '"])').addClass('d-none');
-			$('#gallery-thumbnails .gallery-thumbnail[data-tag="' + this.getAttribute('href').replace('#', '') + '"]').removeClass('d-none');
-		}
+			// Show thumbnails only with selected tag
+			} else {
+				$thumbnails.find('.gallery-thumbnail:not([data-tag="' + this.getAttribute('href').replace('#', '') + '"])').addClass('d-none');
+				$thumbnails.find('.gallery-thumbnail[data-tag="' + this.getAttribute('href').replace('#', '') + '"]').removeClass('d-none');
+			}
 
-		// Relayout
-		msnry.layout();
-	});
-
+			// Relayout
+			msnry.layout();
+		});
+	}
+	
 });

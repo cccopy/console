@@ -303,22 +303,19 @@
 		{% set tagfield = field.name %}
 	{% endif %}
 {% endfor %}
+
+{% set hasAction = layouts.actions|length %}
+{% set taglist = datalist | getValueSet(tagfield) %}
+
 <ul id="gallery-filter" class="nav nav-tabs tabs-alt mb-4">
 	<li class="nav-item">
 		<a class="nav-link active" href="#all">All</a>
 	</li>
-	<!-- <li class="nav-item">
-		<a class="nav-link" href="#nature">Nature</a>
-	</li>
+	{% for tag in taglist %}
 	<li class="nav-item">
-		<a class="nav-link" href="#car">Cars</a>
+		<a class="nav-link" href="#{{tag}}">{{tag}}</a>
 	</li>
-	<li class="nav-item">
-		<a class="nav-link" href="#animal">Animal</a>
-	</li>
-	<li class="nav-item">
-		<a class="nav-link" href="#other">Other</a>
-	</li> -->
+	{% endfor %}
 </ul>
 <!-- Lightbox template -->
 <div id="gallery-lightbox" class="blueimp-gallery blueimp-gallery-controls">
@@ -333,18 +330,22 @@
 <div id="gallery-thumbnails" class="row form-row">
 	<!-- Add this element to properly relayout grid -->
 	<div class="gallery-sizer col-sm-6 col-md-6 col-xl-3 position-absolute"></div>
-
 	{% for data in datalist %}
 		{% set tag = '' %}
 		{% set image = data[imagefield] %}
 		{% if data[tagfield]|length %}
 			{% set tag = data[tagfield] %}
 		{% endif %}
-		<div class="gallery-thumbnail col-sm-6 col-md-6 col-xl-3 mb-2" data-tag="{{ tag }}">
+		<div class="gallery-thumbnail col-sm-6 col-md-6 col-xl-3 mb-2" data-tag="{{ tag }}" data-id="{{ data.id }}">
 			<a href="{{ image.url }}" class="img-thumbnail img-thumbnail-zoom-in">
 				<span class="img-thumbnail-overlay bg-dark opacity-25"></span>
 				<span class="img-thumbnail-content display-4 text-white">
-					<i class="ion ion-ios-search"></i>
+					<i class="ion ion-md-search"></i>
+					{% if hasAction %}
+					{% for act in layouts.actions %}
+					<i class="{{ act.iconCls }}" action-url="{{ act.url }}" action-method="{{ act.method }}"></i>
+					{% endfor %}
+					{% endif %}
 				</span>
 				<img src="{{ image.url }}" class="img-fluid">
 			</a>

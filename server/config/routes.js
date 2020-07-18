@@ -212,6 +212,12 @@ module.exports = function(app, passport) {
     nunEnv.addFilter("locale", function(num){
         return Number(num).toLocaleString();
     });
+
+    nunEnv.addFilter("getValueSet", function(list, key){
+        let theset = new Set(list.map(it => it[key]))
+        return [...theset];
+    });
+
     nunEnv.addGlobal("menus", menus);
     nunEnv.addGlobal("widgets", widgets);
 
@@ -332,8 +338,28 @@ module.exports = function(app, passport) {
                 });
                 app.delete(`/${modelName}/:id/ajax/delete`, loginRequired, function(req, res, next){
                     const lookid = req.params.id;
-                    interface[`remove${singleCap}`](lookid)
-                        .then(function(){ sendOk(res) })
+                    const fields = collectFields(layouts);
+                    const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
+                    let fileHandler = new FileHandler(modelName);
+
+                    let promiseChain = Promise.resolve();
+                    if (fileFields.length) {
+                        promiseChain = promiseChain
+                            .then(() => interface[`get${singleCap}`]({ id: lookid }))
+                            .then(results => {
+                                if ( results && results.length ){
+                                    originData = results[0];
+                                    _.each(fileFields, fd => {
+                                        fileHandler.remove(originData, fd.name);
+                                    });
+                                }
+                            })
+                            .then(() => fileHandler.exec());
+                    }
+
+                    promiseChain
+                        .then(() => interface[`remove${singleCap}`](lookid))
+                        .then(() => sendOk(res))
                         .catch(next);
                 });
             } else if (actionName == "create") {

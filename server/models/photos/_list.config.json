@@ -19,8 +19,14 @@
 	],
 	"actions": [
 		{
+			"label": "編輯",
+			"url": ":id/update",
+			"iconCls": "ion ion-md-create"
+		},
+		{
 			"label": "刪除",
 			"url": ":id/ajax/delete",
+			"iconCls": "ion ion-md-close",
 			"method": "delete"
 		}
 	]
