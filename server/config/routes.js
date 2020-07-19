@@ -44,7 +44,8 @@ const globals = {
         { label: "影片", value: "video" },
         { label: "聲音", value: "audio" },
         { label: "文件", value: "file" }
-    ]
+    ],
+    photoTags: []
 };
 
 // route middleware to make sure a user is logged in
@@ -81,22 +82,46 @@ function findSelectionLabel(val, selections) {
     return resOptions.length ? resOptions[0].label : "";
 }
 
-function getRelatedData(fields){
-    const relatedFields = _.filter(fields, fd => !!fd.related );
+function getRelatedData(model, fields){
+    const relatedFields = _.filter(fields, fd => !!fd.related);
+    const globalRelatedFields = _.remove(relatedFields, fd => fd.related.substr(0, 8) == "globals.");
+
     let relatedData = {};
 
+    // collect all globals
     Object.keys(globals).forEach(key => {
         relatedData["globals." + key] = globals[key];
     });
 
-    let relatedPromises = relatedFields.map( fd => {
-        return interface["get" + utils.capitalize(pluralize(fd.related))]()
-            .then( results => {
-                let nextData = {};
-                nextData[fd.related] = results;
-                return nextData;
-            });
-    });
+    let relatedPromises = [];
+
+    // collect global that should update from model
+    relatedPromises = _.concat(relatedPromises,
+        _.map(
+            _.filter(globalRelatedFields, fd => fd.relatedUseModel === true),
+            fd => {
+                return interface[`get${utils.capitalize(model)}`]()
+                    .then(results => {
+                        let key = fd.related.split("globals.")[1];
+                        updateGlobals(key, results, fd.name);
+                        relatedData["globals." + key] = globals[key];
+                    });
+            }
+        )
+    );
+
+    relatedPromises = _.concat(relatedPromises,
+        _.map(relatedFields, fd => {
+            return interface["get" + utils.capitalize(pluralize(fd.related))]()
+                .then( results => {
+                    let nextData = {};
+                    nextData[fd.related] = results;
+                    return nextData;
+                });
+            }
+        )
+    );
+
     return Promise.all(relatedPromises)
         .then( results => {
             _.each(results, result => {
@@ -151,9 +176,26 @@ function mergeCollectionRelateds(fields, mutableData){
     return Promise.all(collectionPromise);
 }
 
+function updateGlobals(keyname, datalist, fieldName) {
+    let theset = new Set(datalist.map(d => d[fieldName]));
+    globals[keyname] = _.map([...theset], t => {
+        return { label: t, value: t };
+    });
+}
+
 function notFound(res){ res.status(404).send("Not found."); }
 function badRequest(res){ res.status(400).send("Bad request."); }
 function sendOk(res){ res.status(200).send("Ok."); }
+
+// get global related cache
+interface.getPhotos()
+    .then(results => {
+        const fields = collectFields(photos_createLayout);
+        const tagField = _.filter(fields, function(fd){ return fd.related == "globals.photoTags" })[0];
+        if (tagField) {
+            updateGlobals("photoTags", results, tagField.name);
+        }
+    });
 
 module.exports = function(app, passport) {
 
@@ -311,7 +353,7 @@ module.exports = function(app, passport) {
                         const fields = collectFields(layout);
                         res.render(path, { 
                             layouts: layout, 
-                            data: { _relateds: await getRelatedData(fields) }
+                            data: { _relateds: await getRelatedData(modelName, fields) }
                         } );
                     };
                 }
@@ -435,7 +477,7 @@ module.exports = function(app, passport) {
                         const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
 
                         interface[`get${singleCap}`]({ id: lookid })
-                            .then(results => {
+                            .then(async results => {
                                 if ( results && results.length ){
                                     let mutableData = results[0];
 
@@ -443,6 +485,8 @@ module.exports = function(app, passport) {
                                         let val = mutableData[fd.name];
                                         mutableData[fd.name] = (val && val.url) ? val.url : "";
                                     });
+
+                                    mutableData._relateds = await getRelatedData(modelName, fields);
 
                                     res.render(`${modelName}/${r.path.replace(":","_")}`, { 
                                         layouts: layouts,
@@ -580,7 +624,7 @@ module.exports = function(app, passport) {
         interface.getItem({ id: lookid })
             .then(async function(results){
                 if (!results.length) return Promise.reject(notFound(res));
-                let relatedData = await getRelatedData(fields);
+                let relatedData = await getRelatedData("items", fields);
                 let mutableData = results[0];
                 _.each(transferFields, function(fd){
                     _.each(mutableData[fd.name] || [], function(data){

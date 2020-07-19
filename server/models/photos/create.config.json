@@ -11,7 +11,11 @@
         {
             "name": "tag",
             "label": "標籤",
-            "type": "string"
+            "type": "string",
+            "related": "globals.photoTags",
+            "relatedUseModel": true,
+            "layout": "tags-single-selection",
+            "autoCreate": true
         },
         {
             "name": "description",
