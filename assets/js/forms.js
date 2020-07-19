@@ -20,10 +20,11 @@ $(function() {
 	var blockSubmit = false;
 	$('.select2-tags').each(function() {
 		var self = $(this);
+		var isAutoCreate = self.attr("autoCreate") != undefined;
 		self.wrap('<div class="position-relative"></div>')
 			.select2({
-				tags: self.attr("autoCreate") != undefined,
-				placeholder: '請點選',
+				tags: isAutoCreate,
+				placeholder: isAutoCreate ? '請點選 或 自行輸入' : '請點選',
 				dropdownParent: self.parent()
 			})
 			.on("select2:select", function(evt){
