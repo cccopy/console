@@ -25,7 +25,9 @@
             <!-- Links -->
             <ul class="sidenav-inner py-1">
                 {% for menu in menus %}
-                    {% if menu.url %}
+                    {% if menu == 'divider' %}
+                    <li class="sidenav-divider mb-1"></li>
+                    {% elif menu.url %}
                     {% set inbase = currentpath|isNamebase(menu.url) %}
                     <li class="sidenav-item {% if inbase %}open active{% endif %}">
                         <a href="{{ menu.url }}" class="sidenav-link">

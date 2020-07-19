@@ -16,32 +16,18 @@
 	},
 	{
 		"title": "訂單管理",
-		"iconClass": "ion ion-md-business",
+		"iconClass": "ion ion-md-list",
 		"url": "/orders/"
 	},
-	{
-		"title": "會員管理",
-		"iconClass": "ion ion-md-business",
-		"urlbase": "/clients",
-		"items": [
-			{
-				"title": "列表",
-				"url": "/"
-			},
-			{
-				"title": "新增",
-				"url": "/create"
-			}
-		]
-	},
+	"divider",
 	{
 		"title": "關鍵字",
-		"iconClass": "ion ion-md-business",
+		"iconClass": "ion ion-md-pricetags",
 		"url": "/keywords/"
 	},
 	{
 		"title": "職人角色",
-		"iconClass": "ion ion-md-business",
+		"iconClass": "fas fa-user-check",
 		"urlbase": "/experts",
 		"items": [
 			{
@@ -56,7 +42,7 @@
 	},
 	{
 		"title": "使用者經驗分享",
-		"iconClass": "ion ion-md-business",
+		"iconClass": "ion ion-md-text",
 		"urlbase": "/sharings",
 		"items": [
 			{
@@ -71,7 +57,7 @@
 	},
 	{
 		"title": "圖庫",
-		"iconClass": "ion ion-md-business",
+		"iconClass": "ion ion-md-images",
 		"urlbase": "/photos",
 		"items": [
 			{
@@ -85,6 +71,22 @@
 			{
 				"title": "批次新增圖片",
 				"url": "/batchcreate"
+			}
+		]
+	},
+	"divider",
+	{
+		"title": "會員管理",
+		"iconClass": "ion ion-md-person",
+		"urlbase": "/clients",
+		"items": [
+			{
+				"title": "列表",
+				"url": "/"
+			},
+			{
+				"title": "新增",
+				"url": "/create"
 			}
 		]
 	}
