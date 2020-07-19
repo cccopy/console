@@ -31,6 +31,8 @@
 		{{ forms.textbutton(fieldname, label=field.label, placeholder=placeholder) }}
 	{% elif field.layout == 'selection' %}
 		{{ forms.selection(fieldname, tip=field.tip, options=relateds[field.related], value=data[field.name], emptylabel=field.emptylabel, required=field.required) }}
+	{% elif field.layout == 'tags-single-selection' %}
+		{{ forms.tagsselection(fieldname, tip=field.tip, options=data._relateds[field.related], values=data[field.name], autoCreate=field.autoCreate, required=field.required, multiple=false) }}
 	{% else %}
 		{{ forms.textfield(fieldname, value=data[field.name], tip=field.tip, placeholder=placeholder, required=field.required, unique=field.unique) }}
 	{% endif %}
