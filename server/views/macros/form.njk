@@ -90,9 +90,12 @@
 <button type="button" class="btn btn-outline-primary"><i class="ion ion-md-add"></i> {{ label }}</button>
 {% endmacro %}
 
-{% macro tagsselection(name, label='', options=[], values=[], tip='', autoCreate=false, required=false) %}
+{% macro tagsselection(name, label='', options=[], values=[], tip='', autoCreate=false, required=false, multiple=true) %}
 {% if label|length %}{{ label }}{% endif %}
-<select {% if name|length %}name="{{ name + '[]' }}"{% endif %} class="select2-tags form-control" multiple {% if autoCreate %}autoCreate{% endif %} {% if required %}required{% endif %}>
+<select {% if name|length %}name="{{ name + '[]' }}"{% endif %} class="select2-tags form-control" {% if multiple %}multiple{% endif %} {% if autoCreate %}autoCreate{% endif %} {% if required %}required{% endif %}>
+	{% if not multiple %}
+	<option value=""></option>
+	{% endif %}
 	{% for opt in options %}
 	{% set selected = false %}
 	{% if values|length and opt.value in values %}
