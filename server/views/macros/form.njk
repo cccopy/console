@@ -92,14 +92,24 @@
 
 {% macro tagsselection(name, label='', options=[], values=[], tip='', autoCreate=false, required=false, multiple=true) %}
 {% if label|length %}{{ label }}{% endif %}
-<select {% if name|length %}name="{{ name + '[]' }}"{% endif %} class="select2-tags form-control" {% if multiple %}multiple{% endif %} {% if autoCreate %}autoCreate{% endif %} {% if required %}required{% endif %}>
+{% set inputname = name %}
+{% if multiple %}
+	{% set inputname = name + '[]' %}
+{% endif %}
+<select {% if name|length %}name="{{ inputname }}"{% endif %} class="select2-tags form-control" {% if multiple %}multiple{% endif %} {% if autoCreate %}autoCreate{% endif %} {% if required %}required{% endif %}>
 	{% if not multiple %}
 	<option value=""></option>
 	{% endif %}
 	{% for opt in options %}
 	{% set selected = false %}
-	{% if values|length and opt.value in values %}
-		{% set selected = true %}
+	{% if multiple %}
+		{% if values|length and opt.value in values %}
+			{% set selected = true %}
+		{% endif %}
+	{% else %}
+		{% if values == opt.value %}
+			{% set selected = true %}
+		{% endif %}
 	{% endif %}
 	<option value="{{ opt.value }}" {% if selected %}selected{% endif %}>{{ opt.label }}</option>
     {% endfor %}

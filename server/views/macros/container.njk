@@ -48,8 +48,12 @@
 	{% else %}
 		{{ forms.imagefilefield(fieldname, value=data[field.name]) }}
 	{% endif %}
-{% elif field.type == 'collection' and field.layout == 'tags-selection' %}
-	{{ forms.tagsselection(fieldname, tip=field.tip, options=data._relateds[field.related], values=data[field.name], autoCreate=field.autoCreate, required=field.required) }}
+{% elif field.type == 'collection' %}
+	{% if field.layout == 'tags-selection' %}
+		{{ forms.tagsselection(fieldname, tip=field.tip, options=data._relateds[field.related], values=data[field.name], autoCreate=field.autoCreate, required=field.required) }}
+	{% elif field.layout == 'tags-single-selection' %}
+		{{ forms.tagsselection(fieldname, tip=field.tip, options=data._relateds[field.related], values=data[field.name], autoCreate=field.autoCreate, required=field.required, multiple=false) }}
+	{% endif %}
 {% elif field.type == 'json' %}
 	{% if field.layout == 'list' %}
 		{{ editlist(fieldname, field.fields, data[field.name]) }}

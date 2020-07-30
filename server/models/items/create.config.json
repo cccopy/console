@@ -45,6 +45,18 @@
 					"type": "text"
 				},
 				{
+					"name": "expert",
+					"label": "職人角色",
+					"type": "collection",
+					"related": "expert",
+					"valueMap": {
+						"label": "name",
+						"value": "id"
+					},
+					"required": true,
+					"layout": "tags-single-selection"
+				},
+				{
 					"name": "produceTeam",
 					"label": "製作團隊",
 					"type": "string"
@@ -74,7 +86,8 @@
 					"label": "關鍵字",
 					"required": true,
 					"layout": "tags-selection",
-					"autoCreate": true
+					"autoCreate": true,
+					"saveAsJson": true
 				},
 				{
 					"name": "delivery",

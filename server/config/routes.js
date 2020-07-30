@@ -152,25 +152,34 @@ function mergeCollectionRelateds(fields, mutableData){
             lodashMethod = "toSafeInteger";
         }
         if (lodashMethod) {
-            let toPromises = _.map(mutableData[fd.name] || [], val => {
-                let converted =  _[lodashMethod](val);
-                if ( converted == 0 ) {
-                    let toCreate = {};
-                    toCreate[fd.valueOnCreate] = val;
-                    return interface["create" + utils.capitalize(fd.related)](toCreate)
-                        .then( result => {
-                            if (typeof result == "object") return result.id;
-                            else if (Array.isArray(result)) return result[0].id;
-                        });
+            if (fd.autoCreate === true) {
+                let toPromises = _.map(mutableData[fd.name] || [], val => {
+                    let converted =  _[lodashMethod](val);
+                    if ( converted == 0 ) {
+                        let toCreate = {};
+                        toCreate[fd.valueOnCreate] = val;
+                        return interface["create" + utils.capitalize(fd.related)](toCreate)
+                            .then( result => {
+                                if (typeof result == "object") return result.id;
+                                else if (Array.isArray(result)) return result[0].id;
+                            });
+                    }
+                    return Promise.resolve(converted);
+                });
+                collectionPromise.push(
+                    Promise.all(toPromises)
+                        .then( collectRes => {
+                            mutableData[fd.name] = collectRes;
+                        })
+                );
+            } else {
+                let target = mutableData[fd.name];
+                if (Array.isArray(mutableData[fd.name])) {
+                    mutableData[fd.name] = _.map(target, val => _[lodashMethod](val));
+                } else {
+                    mutableData[fd.name] = _[lodashMethod](target);
                 }
-                return Promise.resolve(converted);
-            });
-            collectionPromise.push(
-                Promise.all(toPromises)
-                    .then( collectRes => {
-                        mutableData[fd.name] = collectRes;
-                    })
-            );
+            }
         }
     });
     return Promise.all(collectionPromise);
@@ -475,6 +484,7 @@ module.exports = function(app, passport) {
                         const lookid = req.params.id;
                         const fields = collectFields(layouts);
                         const fileFields = _.filter(fields, fd => fd.type == "image-file" || fd.type == "file");
+                        const collectionFields = _.filter(fields, function(fd){ return fd.type == "collection" });
 
                         interface[`get${singleCap}`]({ id: lookid })
                             .then(async results => {
@@ -484,6 +494,17 @@ module.exports = function(app, passport) {
                                     _.each(fileFields, fd => {
                                         let val = mutableData[fd.name];
                                         mutableData[fd.name] = (val && val.url) ? val.url : "";
+                                    });
+
+                                    _.each(collectionFields, fd => {
+                                        let target;
+                                        if (fd.saveAsJson !== true && (target = mutableData[fd.name])) {
+                                            if (Array.isArray(target)) {
+                                                mutableData[fd.name] = _.map(target, t => t[fd.valueMap["value"]]);
+                                            } else {
+                                                mutableData[fd.name] = target[fd.valueMap["value"]];
+                                            }
+                                        }
                                     });
 
                                     mutableData._relateds = await getRelatedData(modelName, fields);
@@ -619,7 +640,8 @@ module.exports = function(app, passport) {
         const lookid = req.params.id,
             fields = collectFields(items_createLayout),
             transferFields = _.filter(fields, function(fd){ return fd.type == "json" }),
-            integerFields = _.filter(fields, function(fd){ return fd.type == "integer" });
+            integerFields = _.filter(fields, function(fd){ return fd.type == "integer" }),
+            collectionFields = _.filter(fields, function(fd){ return fd.type == "collection" });
 
         interface.getItem({ id: lookid })
             .then(async function(results){
@@ -644,6 +666,16 @@ module.exports = function(app, passport) {
                 });
                 _.each(integerFields, function(fd){
                     if (mutableData[fd.name] == 0) mutableData[fd.name] = '';
+                });
+                _.each(collectionFields, fd => {
+                    let target;
+                    if (fd.saveAsJson !== true && (target = mutableData[fd.name])) {
+                        if (Array.isArray(target)) {
+                            mutableData[fd.name] = _.map(target, t => t[fd.valueMap["value"]]);
+                        } else {
+                            mutableData[fd.name] = target[fd.valueMap["value"]];
+                        }
+                    }
                 });
                 mutableData._relateds = relatedData;
                 res.render('items/_id/update', { 
